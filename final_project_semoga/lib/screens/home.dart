@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:final_project_semoga/model/historyModel.dart';
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/profile.dart';
 import 'package:final_project_semoga/screens/detailPengantaran.dart';
 import 'package:final_project_semoga/screens/detailHistory.dart';
 import 'package:final_project_semoga/screens/history.dart';
+import 'package:http/http.dart' as http;
+import 'package:final_project_semoga/model/pengantaranModel.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userID;
@@ -13,10 +18,9 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Map<String, dynamic>> pengantaranData =
-      []; // List to hold the fetched pengantaran data
-  List<Map<String, dynamic>> historyData =
-      []; // List to hold the fetched history data
+  List<PengantaranModel> pengantaranData = [];
+
+  List<HistoryModel> historyData = [];
 
   @override
   void initState() {
@@ -26,48 +30,59 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchPengantaranData() async {
-    final apiurl = 'http://10.5.50.150:1224/pengiriman';
-    // Simulate API call and fetch pengantaran data
-    // Replace this with your actual API call to fetch the pengantaran data
-    await Future.delayed(Duration(seconds: 2)); // Simulating delay
-    List<Map<String, dynamic>> apiPengantaranData = [
-      {
-        'orderNumber': '123',
-        'jadwalPengantaran': '2023-07-10',
-        'tujuan': 'Destination 1',
-      },
-      {
-        'orderNumber': '456',
-        'jadwalPengantaran': '2023-07-12',
-        'tujuan': 'Destination 2',
-      },
-      // Add more data here if needed
-    ];
-    setState(() {
-      pengantaranData = apiPengantaranData;
-    });
+    final apiUrl = 'http://10.5.50.150:1224/pengiriman/${widget.userID}';
+
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        // Successfully fetched data from the API
+        // Parse the response body, which should be a list of Map<String, dynamic>
+        List<Map<String, dynamic>> apiPengantaranData =
+            List<Map<String, dynamic>>.from(jsonDecode(response.body));
+        List<PengantaranModel> pengantaranModel = apiPengantaranData
+            .map((data) => PengantaranModel.fromJson(data))
+            .toList();
+        setState(() {
+          pengantaranData = pengantaranModel;
+          print(pengantaranData);
+        });
+      } else {
+        // API call failed or returned an error status code
+        print('API call failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Error occurred during API call
+      print('Error: $e');
+    }
   }
 
   Future<void> fetchHistoryData() async {
+    final apiUrl = 'http://10.5.50.150:1224/historyDriver/${widget.userID}';
     // Simulate API call and fetch history data
     // Replace this with your actual API call to fetch the history data
-    await Future.delayed(Duration(seconds: 2)); // Simulating delay
-    List<Map<String, dynamic>> apiHistoryData = [
-      {
-        'orderNumber': '789',
-        'tanggalSampai': '2023-07-15',
-        'tujuan': 'Destination 3',
-      },
-      {
-        'orderNumber': '012',
-        'tanggalSampai': '2023-07-20',
-        'tujuan': 'Destination 4',
-      },
-      // Add more data here if needed
-    ];
-    setState(() {
-      historyData = apiHistoryData;
-    });
+    try {
+      final response = await http.get(Uri.parse(apiUrl));
+
+      if (response.statusCode == 200) {
+        // Successfully fetched data from the API
+        // Parse the response body, which should be a list of Map<String, dynamic>
+        List<Map<String, dynamic>> apiHistoryData =
+            List<Map<String, dynamic>>.from(jsonDecode(response.body));
+        List<HistoryModel> historyModel =
+            apiHistoryData.map((data) => HistoryModel.fromJson(data)).toList();
+        setState(() {
+          historyData = historyModel;
+          //print(historyData);
+        });
+      } else {
+        // API call failed or returned an error status code
+        print('API call failed with status code: ${response.statusCode}');
+      }
+    } catch (e) {
+      // Error occurred during API call
+      print('Error: $e');
+    }
   }
 
   @override
@@ -98,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
                   child: Text(
-                    'List Pengantaran ${widget.userID}',
+                    'List Pengantaran',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -106,87 +121,52 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              Container(
-                // atur lebar sesuai kebutuhan Anda
-                height: 80,
-                child: Card(
-                  color: Color.fromARGB(
-                      1, 206, 206, 206), // Set the desired shade of grey
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      child: Icon(Icons.image), // Replace with your thumbnail
-                    ),
-                    title: Text('Order Number'),
-                    titleTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 18),
-                    minVerticalPadding: 10.0,
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Jadwal Pengantaran',
+              // Generate cards for List Pengantaran section using ListView.builder
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: pengantaranData.length,
+                itemBuilder: (context, index) {
+                  final pengantaranItem = pengantaranData[index];
+                  final orderNumber = pengantaranItem.orderNumber;
+                  final jadwalPengantaran = pengantaranItem.jadwalPengantaran;
+                  final tujuan = pengantaranItem.tujuan;
+
+                  return Container(
+                    height: 80,
+                    child: Card(
+                      color: Color.fromARGB(1, 206, 206, 206),
+                      child: ListTile(
+                        minVerticalPadding: 10.0,
+                        leading: CircleAvatar(
+                          child:
+                              Icon(Icons.image), // Replace with your thumbnail
                         ),
-                        Text('Tujuan'),
-                      ],
+                        title: Text('$orderNumber'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                                '${jadwalPengantaran.toString()}'), // Use appropriate formatting for DateTime
+                            Text('$tujuan'),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          alignment: Alignment.topCenter,
+                          icon: Icon(Icons.arrow_forward),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailPengantaranScreen(),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                    trailing: IconButton(
-                      alignment: Alignment.topCenter,
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DetailPengantaranScreen()),
-                        );
-                      },
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailPengantaranScreen()),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                // atur lebar sesuai kebutuhan Anda
-                height: 80,
-                child: Card(
-                  color: const Color.fromARGB(
-                      1, 206, 206, 206), // Set the desired shade of grey
-                  child: ListTile(
-                    minVerticalPadding: 10.0,
-                    leading: CircleAvatar(
-                      child: Icon(Icons.image), // Replace with your thumbnail
-                    ),
-                    title: Text('Order Number'),
-                    titleTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 18),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Jadwal Pengantaran'),
-                        Text('Tujuan'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      alignment: Alignment.topCenter,
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        // Add the desired functionality when the button is pressed
-                      },
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailPengantaranScreen()),
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),
@@ -202,85 +182,54 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-          Container(
-            // atur lebar sesuai kebutuhan Anda
-            height: 80,
-            child: Card(
-              color: const Color.fromARGB(
-                  1, 206, 206, 206), // Set the desired shade of grey
-              child: ListTile(
-                minVerticalPadding: 10.0,
-                leading: CircleAvatar(
-                  child: Icon(Icons.image), // Replace with your thumbnail
+          // Generate cards for History section using ListView.builder
+          ListView.builder(
+            shrinkWrap: true,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: historyData.length,
+            itemBuilder: (context, index) {
+              final data = historyData[index];
+              final orderNumber = data.orderNumber;
+              print(orderNumber);
+              final tanggalSampai = data.tanggalSampai;
+              print(tanggalSampai);
+              final tujuan = data.tujuan;
+              print(tujuan);
+
+              return Container(
+                height: 80,
+                child: Card(
+                  color: Color.fromARGB(1, 206, 206, 206),
+                  child: ListTile(
+                    minVerticalPadding: 10.0,
+                    leading: CircleAvatar(
+                      child: Icon(Icons.image), // Replace with your thumbnail
+                    ),
+                    title: Text('$orderNumber'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                            '${tanggalSampai.toString()}'), // Use appropriate formatting for DateTime
+                        Text('$tujuan'),
+                      ],
+                    ),
+                    trailing: IconButton(
+                      alignment: Alignment.topCenter,
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DetailHistoryScreen(),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                title: Text('Order Number'),
-                titleTextStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Tanggal Sampai'), // Different subtitle for history
-                    Text('Tujuan'),
-                  ],
-                ),
-                trailing: IconButton(
-                  alignment: Alignment.topCenter,
-                  icon: Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailHistoryScreen()),
-                    );
-                  },
-                ),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DetailHistoryScreen()),
-                ),
-              ),
-            ),
-          ),
-          Container(
-            // atur lebar sesuai kebutuhan Anda
-            height: 80,
-            child: Card(
-              color: const Color.fromARGB(
-                  1, 206, 206, 206), // Set the desired shade of grey
-              child: ListTile(
-                minVerticalPadding: 10.0,
-                leading: CircleAvatar(
-                  child: Icon(Icons.image), // Replace with your thumbnail
-                ),
-                title: Text('Order Number'),
-                titleTextStyle: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                    fontSize: 18),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Tanggal Sampai'), // Different subtitle for history
-                    Text('Tujuan'),
-                  ],
-                ),
-                trailing: IconButton(
-                  alignment: Alignment.topCenter,
-                  icon: Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    // Add the desired functionality when the button is pressed
-                  },
-                ),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => DetailHistoryScreen()),
-                ),
-              ),
-            ),
+              );
+            },
           ),
           Container(
             padding: const EdgeInsets.all(8.0),
@@ -301,35 +250,6 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      // ini untuk kalo mau pake api tinggal ditambah copy untuk yang history data dan ditambah button view more untuk ke page history
-      // body: ListView.builder(
-      //   itemCount: pengantaranData.length,
-      //   itemBuilder: (context, index) {
-      //     final data = pengantaranData[index];
-      //     return Card(
-      //       color: Colors.grey[200], // Set the desired shade of grey
-      //       child: ListTile(
-      //         leading: CircleAvatar(
-      //           child: Icon(Icons.image), // Replace with your thumbnail
-      //         ),
-      //         title: Text(data['orderNumber'] ?? ''),
-      //         subtitle: Column(
-      //           crossAxisAlignment: CrossAxisAlignment.start,
-      //           children: [
-      //             Text(data['jadwalPengantaran'] ?? ''),
-      //             Text(data['tujuan'] ?? ''),
-      //           ],
-      //         ),
-      //         trailing: IconButton(
-      //           icon: Icon(Icons.arrow_forward),
-      //           onPressed: () {
-      //             // Add the desired functionality when the button is pressed
-      //           },
-      //         ),
-      //       ),
-      //     );
-      //   },
-      // ),
     );
   }
 }
