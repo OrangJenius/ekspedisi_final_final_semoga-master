@@ -4,11 +4,11 @@ import 'package:final_project_semoga/screens/pengiriman.dart';
 import '../model/pengantaranModel.dart';
 
 class DetailPengantaranScreen extends StatefulWidget {
-  final String userID;
+  final String userId;
   final PengantaranModel pengantaranItem;
 
   DetailPengantaranScreen({
-    required this.userID,
+    required this.userId,
     required this.pengantaranItem,
   });
 

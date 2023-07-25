@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => DetailPengantaranScreen(
-                                  userID: widget.userID,
+                                  userId: widget.userID,
                                   pengantaranItem:
                                       pengantaranItem, // Kirim data pengantaran yang sesuai ke DetailPengantaranScreen
                                 ),
