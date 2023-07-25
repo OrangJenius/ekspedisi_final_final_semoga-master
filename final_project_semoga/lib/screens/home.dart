@@ -11,6 +11,7 @@ import 'package:final_project_semoga/model/pengantaranModel.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userID;
+
   HomeScreen({required this.userID});
 
   @override
@@ -158,7 +159,11 @@ class _HomeScreenState extends State<HomeScreen> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => DetailPengantaranScreen(),
+                                builder: (context) => DetailPengantaranScreen(
+                                  userID: widget.userID,
+                                  pengantaranItem:
+                                      pengantaranItem, // Kirim data pengantaran yang sesuai ke DetailPengantaranScreen
+                                ),
                               ),
                             );
                           },

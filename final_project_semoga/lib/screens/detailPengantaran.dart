@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/pengiriman.dart';
 
+import '../model/pengantaranModel.dart';
+
 class DetailPengantaranScreen extends StatefulWidget {
+  final String userID;
+  final PengantaranModel pengantaranItem;
+
+  DetailPengantaranScreen({
+    required this.userID,
+    required this.pengantaranItem,
+  });
+
   @override
   _DetailPengantaranScreenState createState() =>
       _DetailPengantaranScreenState();
@@ -39,7 +49,7 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Center(
                         child: Text(
-                          'Nomor Order',
+                          '${widget.pengantaranItem.orderNumber}',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -55,7 +65,7 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        'Driver Name',
+                        '${widget.pengantaranItem.user_nama}',
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -66,7 +76,8 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Nama Kendaraan'),
+                      subtitle: Text(
+                          '${widget.pengantaranItem.kendaraan_jenis_kendaraan}'),
                     ),
                     ListTile(
                       title: Text(
@@ -75,7 +86,8 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Nomor'),
+                      subtitle: Text(
+                          '${widget.pengantaranItem.kendaraan_nomor_plat}'),
                     ),
                     ListTile(
                       title: Text(
@@ -84,7 +96,7 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Barang'),
+                      subtitle: Text('${widget.pengantaranItem.barang_jenis}'),
                     ),
                     ListTile(
                       title: Text(
@@ -93,7 +105,8 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Alamat'),
+                      subtitle:
+                          Text('${widget.pengantaranItem.ekspedisi_kota_asal}'),
                     ),
                     ListTile(
                       title: Text(
@@ -102,7 +115,7 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Alamat'),
+                      subtitle: Text('${widget.pengantaranItem.tujuan}'),
                     ),
                     ListTile(
                       title: Text(
@@ -111,7 +124,8 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Tanggal'),
+                      subtitle:
+                          Text('${widget.pengantaranItem.jadwalPengantaran}'),
                     ),
                   ],
                 ),
