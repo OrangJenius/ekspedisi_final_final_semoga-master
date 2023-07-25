@@ -1,6 +1,12 @@
+import 'package:final_project_semoga/model/historyModel.dart';
 import 'package:flutter/material.dart';
 
 class DetailHistoryScreen extends StatefulWidget {
+  final HistoryModel historyID;
+  DetailHistoryScreen({
+    required this.historyID,
+  });
+
   @override
   _DetailHistoryScreenState createState() => _DetailHistoryScreenState();
 }
@@ -16,7 +22,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
               Navigator.pop(context);
             },
           ),
-          title: Text('Histori'),
+          title: Text('History'),
           backgroundColor: Colors.black,
         ),
         body: SingleChildScrollView(
@@ -37,7 +43,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                       padding: const EdgeInsets.only(top: 8.0),
                       child: Center(
                         child: Text(
-                          'Nomor Order',
+                          widget.historyID.orderNumber.toString(),
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -53,7 +59,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                         ),
                       ),
                       subtitle: Text(
-                        'Driver Name',
+                        widget.historyID.Driver,
                         style: TextStyle(color: Colors.black),
                       ),
                     ),
@@ -64,7 +70,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Nama Kendaraan'),
+                      subtitle: Text(widget.historyID.jenisKendaraan),
                     ),
                     ListTile(
                       title: Text(
@@ -73,7 +79,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Nomor'),
+                      subtitle: Text(widget.historyID.nomorPlat),
                     ),
                     ListTile(
                       title: Text(
@@ -82,7 +88,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Barang'),
+                      subtitle: Text(widget.historyID.jenisBarang),
                     ),
                     ListTile(
                       title: Text(
@@ -91,7 +97,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Alamat'),
+                      subtitle: Text(widget.historyID.alamatAsal),
                     ),
                     ListTile(
                       title: Text(
@@ -100,7 +106,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Alamat'),
+                      subtitle: Text(widget.historyID.alamatTujuan),
                     ),
                     ListTile(
                       title: Text(
@@ -109,7 +115,8 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Tanggal'),
+                      subtitle:
+                          Text(widget.historyID.tanggalPengantaran.toString()),
                     ),
                     ListTile(
                       title: Text(
@@ -118,7 +125,7 @@ class _DetailHistoryScreenState extends State<DetailHistoryScreen> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      subtitle: Text('Tanggal'),
+                      subtitle: Text(widget.historyID.tanggalSampai.toString()),
                     ),
                   ],
                 ),

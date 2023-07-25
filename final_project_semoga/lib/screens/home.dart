@@ -11,7 +11,6 @@ import 'package:final_project_semoga/model/pengantaranModel.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userID;
-
   HomeScreen({required this.userID});
 
   @override
@@ -161,8 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               MaterialPageRoute(
                                 builder: (context) => DetailPengantaranScreen(
                                   userID: widget.userID,
-                                  pengantaranItem:
-                                      pengantaranItem, // Kirim data pengantaran yang sesuai ke DetailPengantaranScreen
+                                  pengantaranItem: pengantaranItem,
                                 ),
                               ),
                             );
@@ -198,7 +196,7 @@ class _HomeScreenState extends State<HomeScreen> {
               print(orderNumber);
               final tanggalSampai = data.tanggalSampai;
               print(tanggalSampai);
-              final tujuan = data.tujuan;
+              final tujuan = data.alamatTujuan;
               print(tujuan);
 
               return Container(
@@ -226,7 +224,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => DetailHistoryScreen(),
+                            builder: (context) => DetailHistoryScreen(
+                              historyID: data,
+                            ),
                           ),
                         );
                       },
@@ -242,7 +242,10 @@ class _HomeScreenState extends State<HomeScreen> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HistoryScreen()),
+                  MaterialPageRoute(
+                      builder: (context) => HistoryScreen(
+                            historyID: historyData,
+                          )),
                 );
               },
               child: Text(

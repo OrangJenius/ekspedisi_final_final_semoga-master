@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/detailHistory.dart';
+import 'package:final_project_semoga/model/historyModel.dart';
 
 class HistoryScreen extends StatefulWidget {
-  const HistoryScreen({Key? key}) : super(key: key);
+  const HistoryScreen({
+    Key? key,
+    required this.historyID,
+  }) : super(key: key);
+  final List<HistoryModel> historyID;
 
   @override
   _HistoryScreenState createState() => _HistoryScreenState();
@@ -71,85 +76,68 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              Container(
-                // atur lebar sesuai kebutuhan Anda
-                height: 80,
-                child: Card(
-                  color: const Color.fromARGB(
-                      1, 206, 206, 206), // Set the desired shade of grey
-                  child: ListTile(
-                    minVerticalPadding: 10.0,
-                    leading: CircleAvatar(
-                      child: Icon(Icons.image), // Replace with your thumbnail
+              // Use ListView.builder to dynamically generate cards
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: widget.historyID.length,
+                itemBuilder: (context, index) {
+                  final historyItem = widget.historyID[index];
+                  final orderNumber = historyItem.orderNumber;
+                  final jadwalPengantaran = historyItem.tanggalPengantaran;
+                  final tujuan = historyItem.alamatTujuan;
+
+                  return Container(
+                    height: 80,
+                    child: Card(
+                      color: const Color.fromARGB(
+                          1, 206, 206, 206), // Set the desired shade of grey
+                      child: ListTile(
+                        minVerticalPadding: 10.0,
+                        leading: CircleAvatar(
+                          child:
+                              Icon(Icons.image), // Replace with your thumbnail
+                        ),
+                        title: Text('Order Number: $orderNumber'),
+                        titleTextStyle: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black,
+                            fontSize: 18),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Jadwal Pengantaran: $jadwalPengantaran'),
+                            Text('Tujuan: $tujuan'),
+                          ],
+                        ),
+                        trailing: IconButton(
+                          alignment: Alignment.topCenter,
+                          icon: Icon(Icons.arrow_forward),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => DetailHistoryScreen(
+                                  historyID: historyItem,
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DetailHistoryScreen(
+                                historyID: historyItem,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                     ),
-                    title: Text('Order Number'),
-                    titleTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 18),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Jadwal Pengantaran'),
-                        Text('Tujuan'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      alignment: Alignment.topCenter,
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => DetailHistoryScreen()),
-                        );
-                      },
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailHistoryScreen()),
-                    ),
-                  ),
-                ),
-              ),
-              Container(
-                // atur lebar sesuai kebutuhan Anda
-                height: 80,
-                child: Card(
-                  color: const Color.fromARGB(
-                      1, 206, 206, 206), // Set the desired shade of grey
-                  child: ListTile(
-                    minVerticalPadding: 8.0,
-                    leading: CircleAvatar(
-                      child: Icon(Icons.image), // Replace with your thumbnail
-                    ),
-                    title: Text('Order Number'),
-                    titleTextStyle: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                        fontSize: 18),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Jadwal Pengantaran'),
-                        Text('Tujuan'),
-                      ],
-                    ),
-                    trailing: IconButton(
-                      alignment: Alignment.topCenter,
-                      icon: Icon(Icons.arrow_forward),
-                      onPressed: () {
-                        // Add the desired functionality when the button is pressed
-                      },
-                    ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => DetailHistoryScreen()),
-                    ),
-                  ),
-                ),
+                  );
+                },
               ),
             ],
           ),
