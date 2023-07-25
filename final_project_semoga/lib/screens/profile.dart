@@ -1,3 +1,4 @@
+import 'package:final_project_semoga/screens/login.dart';
 import 'package:flutter/material.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -74,6 +75,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: () {
                 // Add your desired functionality when the button is pressed
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(builder: (context) => Login()),
+                  (route) => false, // Pop all routes until the login screen
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(60.0, 50.0),

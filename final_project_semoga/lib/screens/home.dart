@@ -10,7 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool isSwitched = false;
   List<Map<String, dynamic>> pengantaranData =
       []; // List to hold the fetched pengantaran data
   List<Map<String, dynamic>> historyData =
@@ -84,32 +83,6 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           },
         ),
-        actions: [
-          Row(
-            children: [
-              Switch(
-                value: isSwitched,
-                activeColor: Color.fromARGB(255, 14, 169, 24),
-                activeTrackColor: Colors.white,
-                inactiveThumbColor: Color.fromARGB(255, 200, 10, 10),
-                inactiveTrackColor: Colors.grey,
-                onChanged: (value) {
-                  setState(() {
-                    isSwitched = value;
-                  });
-                },
-              ),
-              Text(
-                isSwitched ? 'On' : 'Off',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
       body: ListView(
         padding: EdgeInsets.all(8.0),

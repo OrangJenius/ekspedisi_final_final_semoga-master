@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/lupaPassword.dart';
+import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
   @override
@@ -10,9 +11,66 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   bool _obscurePassword = true;
 
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
+  String _message = '';
+
   void _togglePasswordVisibility() {
     setState(() {
       _obscurePassword = !_obscurePassword;
+    });
+  }
+
+  void _showErrorSnackbar(String errorMessage) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMessage),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+      _message = '';
+    });
+
+    final apiUrl = 'http://10.5.50.150:1224/loginDriver';
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    try {
+      final response = await http.post(Uri.parse(apiUrl),
+          body: {'email': email, 'password': password});
+
+      if (response.statusCode == 200) {
+        // Login successful
+        setState(() {
+          _message = 'Login successful';
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomeScreen()),
+          );
+        });
+      } else {
+        // Login failed
+        setState(() {
+          _message = 'Invalid email or password';
+          _showErrorSnackbar(_message);
+        });
+      }
+    } catch (e) {
+      // Error occurred during API call
+      setState(() {
+        _message = 'Error: $e';
+        _showErrorSnackbar(_message);
+      });
+    }
+
+    setState(() {
+      _isLoading = false;
     });
   }
 
@@ -51,7 +109,8 @@ class _LoginState extends State<Login> {
                       Icons.email,
                       color: Colors.black,
                     ),
-                    hintText: "Username"),
+                    hintText: "Email"),
+                controller: _emailController,
               ),
             ),
             SizedBox(
@@ -82,6 +141,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                     hintText: "Password"),
+                controller: _passwordController,
                 obscureText: _obscurePassword,
               ),
             ),
@@ -112,13 +172,8 @@ class _LoginState extends State<Login> {
                     backgroundColor: const Color.fromARGB(
                         255, 0, 0, 0), // Ubah warna teks tombol menjadi putih
                     minimumSize: Size(50.0, 50.0)),
-                child: Text('Login'),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                },
+                onPressed: _isLoading ? null : _login,
+                child: _isLoading ? CircularProgressIndicator() : Text('Login'),
               ),
             ),
           ],
