@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/lupaPassword.dart';
@@ -31,13 +32,16 @@ class _LoginState extends State<Login> {
     );
   }
 
+  String simpanData = "";
+
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
       _message = '';
     });
 
-    final apiUrl = 'http://10.5.50.150:1224/loginDriver';
+    final apiUrl =
+        'http://10.5.50.150:1224/loginDriver'; // Use HTTPS for secure communication
     final email = _emailController.text;
     final password = _passwordController.text;
 
@@ -47,24 +51,42 @@ class _LoginState extends State<Login> {
 
       if (response.statusCode == 200) {
         // Login successful
+        final responseData = jsonDecode(response.body);
+        final idValue = responseData['id'];
         setState(() {
           _message = 'Login successful';
+          if (idValue != null) {
+            simpanData = idValue.toString();
+          } else {
+            simpanData = 'No ID available';
+          }
+          _showSuccessSnackbar(
+              _message); // Use a custom method for success snackbar
+          // Navigate to the HomeScreen if needed
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => HomeScreen()),
+            MaterialPageRoute(
+                builder: (context) => HomeScreen(userID: simpanData)),
           );
         });
-      } else {
-        // Login failed
+      } else if (response.statusCode == 401) {
+        // Incorrect login credentials
         setState(() {
           _message = 'Invalid email or password';
+          _showErrorSnackbar(_message);
+        });
+      } else {
+        // Other server errors
+        setState(() {
+          _message = 'Server error occurred. Please try again later.';
           _showErrorSnackbar(_message);
         });
       }
     } catch (e) {
       // Error occurred during API call
       setState(() {
-        _message = 'Error: $e';
+        _message =
+            'Failed to connect to the server. Please check your internet connection.';
         _showErrorSnackbar(_message);
       });
     }
@@ -72,6 +94,15 @@ class _LoginState extends State<Login> {
     setState(() {
       _isLoading = false;
     });
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green, // Use a success color
+      ),
+    );
   }
 
   @override

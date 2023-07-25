@@ -5,6 +5,9 @@ import 'package:final_project_semoga/screens/detailHistory.dart';
 import 'package:final_project_semoga/screens/history.dart';
 
 class HomeScreen extends StatefulWidget {
+  final String userID;
+  HomeScreen({required this.userID});
+
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -18,53 +21,54 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    // fetchPengantaranData(); // Fetch pengantaran data from API when the screen initializes
-    // fetchHistoryData(); // Fetch history data from API when the screen initializes
+    fetchPengantaranData(); // Fetch pengantaran data from API when the screen initializes
+    fetchHistoryData(); // Fetch history data from API when the screen initializes
   }
 
-  // Future<void> fetchPengantaranData() async {
-  //   // Simulate API call and fetch pengantaran data
-  //   // Replace this with your actual API call to fetch the pengantaran data
-  //   await Future.delayed(Duration(seconds: 2)); // Simulating delay
-  //   List<Map<String, dynamic>> apiPengantaranData = [
-  //     {
-  //       'orderNumber': '123',
-  //       'jadwalPengantaran': '2023-07-10',
-  //       'tujuan': 'Destination 1',
-  //     },
-  //     {
-  //       'orderNumber': '456',
-  //       'jadwalPengantaran': '2023-07-12',
-  //       'tujuan': 'Destination 2',
-  //     },
-  //     // Add more data here if needed
-  //   ];
-  //   setState(() {
-  //     pengantaranData = apiPengantaranData;
-  //   });
-  // }
+  Future<void> fetchPengantaranData() async {
+    final apiurl = 'http://10.5.50.150:1224/pengiriman';
+    // Simulate API call and fetch pengantaran data
+    // Replace this with your actual API call to fetch the pengantaran data
+    await Future.delayed(Duration(seconds: 2)); // Simulating delay
+    List<Map<String, dynamic>> apiPengantaranData = [
+      {
+        'orderNumber': '123',
+        'jadwalPengantaran': '2023-07-10',
+        'tujuan': 'Destination 1',
+      },
+      {
+        'orderNumber': '456',
+        'jadwalPengantaran': '2023-07-12',
+        'tujuan': 'Destination 2',
+      },
+      // Add more data here if needed
+    ];
+    setState(() {
+      pengantaranData = apiPengantaranData;
+    });
+  }
 
-  // Future<void> fetchHistoryData() async {
-  //   // Simulate API call and fetch history data
-  //   // Replace this with your actual API call to fetch the history data
-  //   await Future.delayed(Duration(seconds: 2)); // Simulating delay
-  //   List<Map<String, dynamic>> apiHistoryData = [
-  //     {
-  //       'orderNumber': '789',
-  //       'tanggalSampai': '2023-07-15',
-  //       'tujuan': 'Destination 3',
-  //     },
-  //     {
-  //       'orderNumber': '012',
-  //       'tanggalSampai': '2023-07-20',
-  //       'tujuan': 'Destination 4',
-  //     },
-  //     // Add more data here if needed
-  //   ];
-  //   setState(() {
-  //     historyData = apiHistoryData;
-  //   });
-  // }
+  Future<void> fetchHistoryData() async {
+    // Simulate API call and fetch history data
+    // Replace this with your actual API call to fetch the history data
+    await Future.delayed(Duration(seconds: 2)); // Simulating delay
+    List<Map<String, dynamic>> apiHistoryData = [
+      {
+        'orderNumber': '789',
+        'tanggalSampai': '2023-07-15',
+        'tujuan': 'Destination 3',
+      },
+      {
+        'orderNumber': '012',
+        'tanggalSampai': '2023-07-20',
+        'tujuan': 'Destination 4',
+      },
+      // Add more data here if needed
+    ];
+    setState(() {
+      historyData = apiHistoryData;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +98,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Center(
                   child: Text(
-                    'List Pengantaran',
+                    'List Pengantaran ${widget.userID}',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
