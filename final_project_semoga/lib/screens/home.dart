@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchPengantaranData() async {
-    final apiUrl = 'http://10.5.50.150:1224/pengiriman/${widget.userID}';
+    final apiUrl = 'http://192.168.1.21:1224/pengiriman/${widget.userID}';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
@@ -58,7 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchHistoryData() async {
-    final apiUrl = 'http://10.5.50.150:1224/historyDriver/${widget.userID}';
+    final apiUrl = 'http://192.168.1.21:1224/historyDriver/${widget.userID}';
     // Simulate API call and fetch history data
     // Replace this with your actual API call to fetch the history data
     try {
