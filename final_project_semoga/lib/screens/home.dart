@@ -107,7 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: EdgeInsets.all(8.0),
         children: [
           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
                 padding: const EdgeInsets.all(16.0),
@@ -136,6 +136,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     height: 80,
                     child: Card(
                       color: Color.fromARGB(1, 206, 206, 206),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            16.0), // Atur nilai sesuai keinginan Anda
+                      ),
                       child: ListTile(
                         minVerticalPadding: 10.0,
                         leading: CircleAvatar(
@@ -202,6 +206,10 @@ class _HomeScreenState extends State<HomeScreen> {
               return Container(
                 height: 80,
                 child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        16.0), // Atur nilai sesuai keinginan Anda
+                  ),
                   color: Color.fromARGB(1, 206, 206, 206),
                   child: ListTile(
                     minVerticalPadding: 10.0,
