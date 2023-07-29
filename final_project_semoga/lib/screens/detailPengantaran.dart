@@ -131,21 +131,24 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                 ),
               ),
               SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => Pengiriman()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  minimumSize: Size(150.0, 50.0),
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
+              Padding(
+                padding: EdgeInsets.only(bottom: 16.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => Pengiriman()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: Size(120.0, 50.0),
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
                   ),
+                  child: Text('Start'),
                 ),
-                child: Text('Start'),
               ),
             ],
           ),
