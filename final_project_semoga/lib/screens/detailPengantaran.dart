@@ -137,7 +137,10 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => Pengiriman()),
+                      MaterialPageRoute(
+                          builder: (context) => Pengiriman(
+                                userID: widget.userID,
+                              )),
                     );
                   },
                   style: ElevatedButton.styleFrom(

@@ -1,9 +1,13 @@
+import 'package:final_project_semoga/screens/home.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
 class Pengiriman extends StatefulWidget {
-  const Pengiriman({Key? key}) : super(key: key);
+  final String userID;
+  Pengiriman({
+    required this.userID,
+  });
 
   @override
   _PengirimanState createState() => _PengirimanState();
@@ -55,63 +59,109 @@ class _PengirimanState extends State<Pengiriman> {
     });
   }
 
+  void _showSelesaiDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Selesai"),
+          content: Text("Apakah pesanan telah sampai ke tempat tujuan?"),
+          actions: [
+            TextButton(
+              onPressed: () {
+                // Close the dialog and navigate back to HomeScreen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => HomeScreen(
+                            userID: widget.userID,
+                          )),
+                );
+              },
+              child: Text("Ya"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close the dialog
+              },
+              child: Text("Tidak"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    Set<Polyline> _polylines = {};
-
-    if (_currentLocation != null) {
-      _polylines.add(Polyline(
-        polylineId: const PolylineId('route'),
-        color: Colors.blue,
-        width: 5,
-        points: [
-          _srcLoc,
-          LatLng(_currentLocation!.latitude!, _currentLocation!.longitude!),
-          _destLoc
-        ],
-      ));
-    }
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('Live Location Tracking'),
       ),
-      body: _currentLocation == null
-          ? const Center(child: Text('Fetching location...'))
-          : GoogleMap(
-              initialCameraPosition: CameraPosition(
-                target: LatLng(
-                  _currentLocation!.latitude!,
-                  _currentLocation!.longitude!,
-                ),
-                zoom: 13.5,
-              ),
-              markers: {
-                Marker(
-                  markerId: const MarkerId('currentLocation'),
-                  position: LatLng(
-                    _currentLocation!.latitude!,
-                    _currentLocation!.longitude!,
+      body: Column(
+        children: [
+          Expanded(
+            child: _currentLocation == null
+                ? const Center(child: Text('Fetching location...'))
+                : GoogleMap(
+                    initialCameraPosition: CameraPosition(
+                      target: LatLng(
+                        _currentLocation!.latitude!,
+                        _currentLocation!.longitude!,
+                      ),
+                      zoom: 13.5,
+                    ),
+                    markers: {
+                      Marker(
+                        markerId: const MarkerId('currentLocation'),
+                        position: LatLng(
+                          _currentLocation!.latitude!,
+                          _currentLocation!.longitude!,
+                        ),
+                        infoWindow: const InfoWindow(title: 'Current Location'),
+                      ),
+                      Marker(
+                        markerId: const MarkerId('source'),
+                        position: _srcLoc,
+                        infoWindow: const InfoWindow(title: 'Source Location'),
+                      ),
+                      Marker(
+                        markerId: const MarkerId('destination'),
+                        position: _destLoc,
+                        infoWindow:
+                            const InfoWindow(title: 'Destination Location'),
+                      ),
+                    },
+                    onMapCreated: (GoogleMapController controller) {
+                      // Remove the setState call from this method
+                      // as it is not required
+                    },
                   ),
-                  infoWindow: const InfoWindow(title: 'Current Location'),
-                ),
-                Marker(
-                  markerId: const MarkerId('source'),
-                  position: _srcLoc,
-                  infoWindow: const InfoWindow(title: 'Source Location'),
-                ),
-                Marker(
-                  markerId: const MarkerId('destination'),
-                  position: _destLoc,
-                  infoWindow: const InfoWindow(title: 'Destination Location'),
-                ),
-              },
-              polylines: _polylines,
-              onMapCreated: (GoogleMapController controller) {
-                // Remove the setState call from this method
-                // as it is not required
-              },
-            ),
+          ),
+          // Add your button here
+          Row(
+            mainAxisAlignment: MainAxisAlignment
+                .spaceAround, // Align buttons to the left and right
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  // Implement the left button's functionality here
+                  // For example, you can show a dialog, navigate to another screen, etc.
+                },
+                child: Text('Kerusakan'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  // Implement the right button's functionality here
+                  // For example, you can show a dialog, navigate to another screen, etc.
+                  _showSelesaiDialog();
+                },
+                child: Text('Selesai'),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
