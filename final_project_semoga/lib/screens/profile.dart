@@ -1,9 +1,8 @@
 import 'dart:convert';
-
-import 'package:final_project_semoga/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:final_project_semoga/model/profileModel.dart';
+
+import 'login.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String userID;
@@ -14,12 +13,13 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  Map<String, dynamic> profileData = {};
+
+  @override
   void initState() {
     super.initState();
-    fetchProfile(); // Fetch history data from API when the screen initializes
+    fetchProfile(); // Fetch profile data from API when the screen initializes
   }
-
-  List<ProfileModel> profileData = [];
 
   Future<void> fetchProfile() async {
     final apiUrl = 'http://192.168.1.21:1224/profile/${widget.userID}';
@@ -29,13 +29,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         // Successfully fetched data from the API
-        // Parse the response body, which should be a list of Map<String, dynamic>
-        List<Map<String, dynamic>> apiProfileData =
-            List<Map<String, dynamic>>.from(jsonDecode(response.body));
-        List<ProfileModel> profileModel =
-            apiProfileData.map((data) => ProfileModel.fromJson(data)).toList();
+        // Parse the response body (JSON), which should be a Map<String, dynamic>
+        Map<String, dynamic> apiResponse = jsonDecode(response.body);
+
         setState(() {
-          profileData = profileModel;
+          profileData = apiResponse['data']
+              [0]; // Store the profile data in the state variable
           print(profileData);
         });
       } else {
@@ -81,7 +80,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 child: ListTile(
                   title: Text(
-                    'Nama Sopir',
+                    profileData.isNotEmpty ? profileData['nama'] : 'Loading...',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -97,6 +96,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 child: ListTile(
                   title: Text('Alamat'),
+                  subtitle: Text(
+                    profileData.isNotEmpty
+                        ? profileData['alamat']
+                        : 'Loading...',
+                  ),
                 ),
               ),
             ),
@@ -107,6 +111,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 },
                 child: ListTile(
                   title: Text('No Hp'),
+                  subtitle: Text(
+                    profileData.isNotEmpty
+                        ? profileData['nomor_telepon'].toString()
+                        : 'Loading...',
+                  ),
                 ),
               ),
             ),
