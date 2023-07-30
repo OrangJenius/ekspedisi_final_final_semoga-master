@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/home.dart';
-import 'package:final_project_semoga/screens/lupaPassword.dart';
+//import 'package:final_project_semoga/screens/lupaPassword.dart';
 import 'package:http/http.dart' as http;
 
 class Login extends StatefulWidget {
@@ -176,23 +176,23 @@ class _LoginState extends State<Login> {
                 obscureText: _obscurePassword,
               ),
             ),
-            Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () {
-                  // Pindahkan pengguna ke halaman lain di sini
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LupaPassword()),
-                  );
-                },
-                child: Text(
-                  "Lupa Password ?",
-                  style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+            // Container(
+            //   padding: EdgeInsets.all(8.0),
+            //   alignment: Alignment.centerRight,
+            //   child: GestureDetector(
+            //     onTap: () {
+            //       // Pindahkan pengguna ke halaman lain di sini
+            //       Navigator.push(
+            //         context,
+            //         MaterialPageRoute(builder: (context) => LupaPassword()),
+            //       );
+            //     },
+            //     child: Text(
+            //       "Lupa Password ?",
+            //       style: TextStyle(fontWeight: FontWeight.bold),
+            //     ),
+            //   ),
+            // ),
             SizedBox(height: 24.0),
             FractionallySizedBox(
               widthFactor:

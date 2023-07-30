@@ -43,7 +43,7 @@ class _LupaPassword extends State<LupaPassword> {
                           Icons.email,
                           color: Colors.black,
                         ),
-                        hintText: "Username"),
+                        hintText: "Email"),
                   ),
                 ),
                 SizedBox(height: 8.0),
