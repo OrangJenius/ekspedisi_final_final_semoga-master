@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:final_project_semoga/screens/historyKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -120,6 +121,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             SizedBox(height: 32.0),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => HistoryKerusakan()));
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: Size(60.0, 50.0),
+                backgroundColor: Colors.black,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+              ),
+              child: Text('Histori Laporan Kerusakan'),
+            ),
+            SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
                 // Add your desired functionality when the button is pressed
