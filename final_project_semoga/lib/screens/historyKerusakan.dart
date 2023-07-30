@@ -13,76 +13,51 @@ class HistoryKerusakan extends StatefulWidget {
 class _HistoryKerusakan extends State<HistoryKerusakan> {
   List<ModelHistoryKerusakan> historyKerusakan = [];
 
-  @override
-  void initState() {
-    super.initState();
-    fetchHistoryKerusakan();
-  }
-
-  Future<void> fetchHistoryKerusakan() async {
-    final apiUrl = 'http://192.168.1.21:1224/laporanKerusakan';
-
+  Future<List<ModelHistoryKerusakan>> getKerusakanData() async {
     try {
-      final response = await http.get(Uri.parse(apiUrl));
-
+      final response = await http
+          .get(Uri.parse('http://192.168.1.21:1224/laporanKerusakan'));
       if (response.statusCode == 200) {
-        List<Map<String, dynamic>> apiHistoryData =
-            List<Map<String, dynamic>>.from(jsonDecode(response.body));
-
-        List<ModelHistoryKerusakan> test = apiHistoryData
-            .map((data) => ModelHistoryKerusakan.fromJson(data))
-            .toList();
-        setState(() {
-          historyKerusakan = test;
-          print(historyKerusakan);
-        });
+        final jsonData = json.decode(response.body);
+        List<ModelHistoryKerusakan> kerusakanList = [];
+        for (var item in jsonData['data']) {
+          kerusakanList.add(ModelHistoryKerusakan.fromJson(item));
+        }
+        return kerusakanList;
       } else {
-        // API call failed or returned an error status code
-        print('API call failed with status code: ${response.statusCode}');
+        throw Exception('Failed to load data');
       }
     } catch (e) {
-      // Error occurred during API call
-      print('Error: $e');
+      throw Exception('Error: $e');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        title: Text("History Kerusakan"),
-      ),
-      body: ListView(
-        padding: EdgeInsets.all(8.0),
-        children: [
-          Column(
-            // crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                child: Center(
-                  child: Text(
-                    'List History Kerusakan',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: historyKerusakan.length,
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('Data Kerusakan Kendaraan'),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          backgroundColor: Colors.black,
+        ),
+        body: FutureBuilder(
+          future: getKerusakanData(),
+          builder: (BuildContext context,
+              AsyncSnapshot<List<ModelHistoryKerusakan>> snapshot) {
+            if (snapshot.hasData) {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
-                  final historyItem = historyKerusakan[index];
-                  final no_plat = historyItem.no_plat;
-                  final jenis_kendaraan = historyItem.jenis_kendaraan;
-                  final kerusakan = historyItem.kerusakan;
-
+                  ModelHistoryKerusakan kerusakan = snapshot.data![index];
                   return Container(
-                    height: 80,
+                    padding: EdgeInsets.only(top: 16.0),
+                    height: 95,
                     child: Card(
                       color: Color.fromARGB(1, 206, 206, 206),
                       shape: RoundedRectangleBorder(
@@ -91,23 +66,27 @@ class _HistoryKerusakan extends State<HistoryKerusakan> {
                       ),
                       child: ListTile(
                         minVerticalPadding: 10.0,
-                        title: Text('$no_plat'),
+                        title: Text('Nomor Plat ${kerusakan.no_plat}'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                                '$jenis_kendaraan'), // Use appropriate formatting for DateTime
-                            Text('$kerusakan'),
+                                'Jenis Kendaraan ${kerusakan.jenis_kendaraan}'), // Use appropriate formatting for DateTime
+                            Text('Kerusakan :  ${kerusakan.kerusakan}'),
                           ],
                         ),
                       ),
                     ),
                   );
                 },
-              ),
-            ],
-          ),
-        ],
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return Center(child: CircularProgressIndicator());
+            }
+          },
+        ),
       ),
     );
   }
