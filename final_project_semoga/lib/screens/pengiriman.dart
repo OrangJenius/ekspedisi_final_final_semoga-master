@@ -1,4 +1,5 @@
 import 'package:final_project_semoga/screens/home.dart';
+import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
@@ -145,8 +146,10 @@ class _PengirimanState extends State<Pengiriman> {
             children: [
               ElevatedButton(
                 onPressed: () {
-                  // Implement the left button's functionality here
-                  // For example, you can show a dialog, navigate to another screen, etc.
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => LaporanKerusakan()));
                 },
                 child: Text('Kerusakan'),
               ),
