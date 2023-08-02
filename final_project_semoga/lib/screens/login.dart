@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/lupaPassword.dart';
 import 'package:http/http.dart' as http;
+import 'package:crypto/crypto.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -45,9 +46,13 @@ class _LoginState extends State<Login> {
     final email = _emailController.text;
     final password = _passwordController.text;
 
+    final List<int> passwordBytes = utf8.encode(password);
+    final Digest sha256Result = sha256.convert(passwordBytes);
+    final hashedPassword = sha256Result.toString();
+
     try {
       final response = await http.post(Uri.parse(apiUrl),
-          body: {'email': email, 'password': password});
+          body: {'email': email, 'password': hashedPassword});
 
       if (response.statusCode == 200) {
         // Login successful
