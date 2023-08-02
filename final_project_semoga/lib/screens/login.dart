@@ -47,7 +47,7 @@ class _LoginState extends State<Login> {
 
     try {
       final response = await http.post(Uri.parse(apiUrl),
-          body: {'email': email, 'password': password});
+          body: {'Email': email, 'Password': password});
 
       if (response.statusCode == 200) {
         // Login successful
