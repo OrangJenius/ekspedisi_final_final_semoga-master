@@ -6,8 +6,10 @@ import 'package:location/location.dart';
 
 class Pengiriman extends StatefulWidget {
   final String userID;
+  final String kendaraan_id;
   Pengiriman({
     required this.userID,
+    required this.kendaraan_id,
   });
 
   @override
@@ -157,7 +159,9 @@ class _PengirimanState extends State<Pengiriman> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LaporanKerusakan()));
+                          builder: (context) => LaporanKerusakan(
+                                kendaraan_id: widget.kendaraan_id,
+                              )));
                 },
                 child: Text('Kerusakan'),
               ),
