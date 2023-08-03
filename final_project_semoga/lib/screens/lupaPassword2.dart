@@ -117,9 +117,9 @@ class _LupaPassword2State extends State<LupaPassword2> {
         backgroundColor: Colors.black,
       ),
       body: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        padding: EdgeInsets.only(top: 32.0, left: 16.0, right: 16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Container(
