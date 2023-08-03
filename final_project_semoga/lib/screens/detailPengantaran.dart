@@ -140,6 +140,9 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                       MaterialPageRoute(
                           builder: (context) => Pengiriman(
                                 userID: widget.userID,
+                                kendaraan_id: widget
+                                    .pengantaranItem.kendaraan_id
+                                    .toString(),
                               )),
                     );
                   },
