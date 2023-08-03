@@ -93,10 +93,10 @@ class _PengirimanState extends State<Pengiriman> {
     );
   }
 
+  Future<void> ambilLokasisekarang() async {
     final apiurl = "http://192.168.1.21:1224/kendaraan";
   }
 
-    final apiurl = "http://192.168.1.21:1224/loginDriver";
   Future<void> ambilLokasiAwadanTujuanl() async {
     final apiurl = "http://192.168.1.21:1224/pengiriman/${widget.userID}";
   }
