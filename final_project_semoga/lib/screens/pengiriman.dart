@@ -1,15 +1,21 @@
+import 'dart:async';
+
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
+import 'package:final_project_semoga/model/pengantaranModel.dart';
+import 'package:http/http.dart' as http;
 
 class Pengiriman extends StatefulWidget {
   final String userID;
   final String kendaraan_id;
+  final PengantaranModel pengantaranItem;
   Pengiriman({
     required this.userID,
     required this.kendaraan_id,
+    required this.pengantaranItem,
   });
 
   @override
@@ -18,18 +24,34 @@ class Pengiriman extends StatefulWidget {
 
 class _PengirimanState extends State<Pengiriman> {
   LocationData? _currentLocation;
-
-  static const LatLng _srcLoc = LatLng(37.422131, -122.084801);
-  static const LatLng _destLoc = LatLng(37.411374, -122.071204);
+  late LatLng _srcLoc;
+  late LatLng _destLoc;
 
   @override
   void initState() {
     super.initState();
+    String locawalnospace =
+        widget.pengantaranItem.titik_awal.replaceAll(" ", "");
+    List<String> LatLngawal = locawalnospace.split(",");
+    _srcLoc = LatLng(double.parse(LatLngawal[0]), double.parse(LatLngawal[1]));
+
+    String locAkhirnospace =
+        widget.pengantaranItem.titk_akhir.replaceAll(" ", "");
+    List<String> LatLngAkhir = locAkhirnospace.split(",");
+    _destLoc =
+        LatLng(double.parse(LatLngAkhir[0]), double.parse(LatLngAkhir[1]));
+
     _currentLocation = LocationData.fromMap({
       "latitude": _srcLoc.latitude,
       "longitude": _srcLoc.longitude,
     });
     _getCurrentLocation();
+    Timer.periodic(Duration(minutes: 1), (timer) {
+      if (_currentLocation != null) {
+        ambilLokasisekarang(
+            _currentLocation!.latitude!, _currentLocation!.longitude!);
+      }
+    });
   }
 
   void _getCurrentLocation() async {
@@ -95,12 +117,21 @@ class _PengirimanState extends State<Pengiriman> {
     );
   }
 
-  Future<void> ambilLokasisekarang() async {
-    final apiurl = "http://192.168.1.21:1224/kendaraan";
-  }
+  Future<void> ambilLokasisekarang(double latitude, double longitude) async {
+    final apiUrl = "http://192.168.1.21:1224/lokasi/${widget.userID}";
+    final response = await http.put(
+      Uri.parse(apiUrl),
+      body: {
+        "latitude": latitude.toString(),
+        "longitude": longitude.toString(),
+      },
+    );
 
-  Future<void> ambilLokasiAwadanTujuanl() async {
-    final apiurl = "http://192.168.1.21:1224/pengiriman/${widget.userID}";
+    if (response.statusCode == 200) {
+      print("Location updated successfully!");
+    } else {
+      print("Failed to update location. Status code: ${response.statusCode}");
+    }
   }
 
   @override

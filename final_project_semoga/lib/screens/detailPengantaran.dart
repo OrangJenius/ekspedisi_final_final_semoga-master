@@ -143,6 +143,7 @@ class _DetailPengantaranScreenState extends State<DetailPengantaranScreen> {
                                 kendaraan_id: widget
                                     .pengantaranItem.kendaraan_id
                                     .toString(),
+                                pengantaranItem: widget.pengantaranItem,
                               )),
                     );
                   },
