@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class LaporanKerusakan extends StatefulWidget {
+  final kendaraan_id;
+
+  const LaporanKerusakan({required this.kendaraan_id});
+
   _LaporanKerusakan createState() => _LaporanKerusakan();
 }
 

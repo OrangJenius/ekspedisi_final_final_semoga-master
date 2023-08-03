@@ -9,6 +9,7 @@ class PengantaranModel {
   final String barang_jenis;
   final String client_alamat;
   final String ekspedisi_kota_asal;
+  final int kendaraan_id;
 
   PengantaranModel({
     required this.orderNumber,
@@ -21,6 +22,7 @@ class PengantaranModel {
     required this.barang_jenis,
     required this.client_alamat,
     required this.ekspedisi_kota_asal,
+    required this.kendaraan_id,
   });
 
   factory PengantaranModel.fromJson(Map<String, dynamic> json) {
@@ -37,6 +39,7 @@ class PengantaranModel {
       barang_jenis: json['barang_jenis'],
       client_alamat: json['client_alamat'],
       ekspedisi_kota_asal: json['ekspedisi_kota_asal'],
+      kendaraan_id: json['kendaraan_id'],
     );
   }
 }

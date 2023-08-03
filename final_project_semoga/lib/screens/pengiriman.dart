@@ -6,8 +6,10 @@ import 'package:location/location.dart';
 
 class Pengiriman extends StatefulWidget {
   final String userID;
+  final String kendaraan_id;
   Pengiriman({
     required this.userID,
+    required this.kendaraan_id,
   });
 
   @override
@@ -93,13 +95,13 @@ class _PengirimanState extends State<Pengiriman> {
     );
   }
 
-  Future<void> ambilLokasisekarang() {
-    final apiurl = "http://192.168.1.21:1224/kendaraan";
-  }
+  // Future<void> ambilLokasisekarang() {
+  //   final apiurl = "http://192.168.1.21:1224/kendaraan";
+  // }
 
-  Future<void> ambilLokasiAwadanTujuanl() {
-    final apiurl = "http://192.168.1.21:1224/loginDriver";
-  }
+  // Future<void> ambilLokasiAwadanTujuanl() {
+  //   final apiurl = "http://192.168.1.21:1224/loginDriver";
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -157,7 +159,9 @@ class _PengirimanState extends State<Pengiriman> {
                   Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => LaporanKerusakan()));
+                          builder: (context) => LaporanKerusakan(
+                                kendaraan_id: widget.kendaraan_id,
+                              )));
                 },
                 child: Text('Kerusakan'),
               ),
