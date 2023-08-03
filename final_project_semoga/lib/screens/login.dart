@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/lupaPassword.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   @override
@@ -40,8 +41,7 @@ class _LoginState extends State<Login> {
       _message = '';
     });
 
-    final apiUrl =
-        'http://192.168.1.21:1224/loginDriver'; // Use HTTPS for secure communication
+    final apiUrl = 'http://192.168.1.21:1224/loginDriver';
     final email = _emailController.text;
     final password = _passwordController.text;
 
@@ -53,20 +53,21 @@ class _LoginState extends State<Login> {
         // Login successful
         final responseData = jsonDecode(response.body);
         final idValue = responseData['id'];
+
+        // Simpan status login ke dalam SharedPreferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLoggedIn', true);
+        prefs.setString('userID', idValue.toString());
+
         setState(() {
           _message = 'Login successful';
-          if (idValue != null) {
-            simpanData = idValue.toString();
-          } else {
-            simpanData = 'No ID available';
-          }
-          _showSuccessSnackbar(
-              _message); // Use a custom method for success snackbar
-          // Navigate to the HomeScreen if needed
+          simpanData = idValue.toString();
+          _showSuccessSnackbar(_message);
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => HomeScreen(userID: simpanData)),
+              builder: (context) => HomeScreen(userID: simpanData),
+            ),
           );
         });
       } else if (response.statusCode == 401) {

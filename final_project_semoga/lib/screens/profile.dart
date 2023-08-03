@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:final_project_semoga/screens/historyKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'login.dart';
 
@@ -20,6 +21,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     fetchProfile(); // Fetch profile data from API when the screen initializes
+  }
+
+  void _logout() async {
+    // Hapus status login dan data terkait lainnya dari SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.remove('isLoggedIn');
+    prefs.remove('userID');
+
+    // Navigate to the Login screen and remove all previous routes
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => Login()),
+      (route) => false, // Pop all routes until the login screen
+    );
   }
 
   Future<void> fetchProfile() async {
@@ -141,11 +156,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ElevatedButton(
               onPressed: () {
                 // Add your desired functionality when the button is pressed
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (context) => Login()),
-                  (route) => false, // Pop all routes until the login screen
-                );
+                _logout();
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: Size(60.0, 50.0),
