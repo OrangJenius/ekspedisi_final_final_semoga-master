@@ -44,7 +44,7 @@ class _PengirimanState extends State<Pengiriman> {
       "longitude": _srcLoc.longitude,
     });
     _getCurrentLocation();
-    Timer.periodic(Duration(seconds: 10), (timer) {
+    Timer.periodic(Duration(minutes: 1), (timer) {
       if (_currentLocation != null) {
         ambilLokasisekarang(
             _currentLocation!.latitude!, _currentLocation!.longitude!);
@@ -116,13 +116,13 @@ class _PengirimanState extends State<Pengiriman> {
   }
 
   Future<void> ambilLokasisekarang(double latitude, double longitude) async {
-    final apiUrl =
-        "http://192.168.1.21:1224/Lokasi/${widget.pengantaranItem.kendaraan_id}";
+    final apiUrl = "http://192.168.1.21:1224/Lokasi/${widget.userID}";
     final response = await http.put(
       Uri.parse(apiUrl),
       body: {
-        "Latitude": latitude.toString(),
-        "Longitude": longitude.toString(),
+        "user_id": widget.userID,
+        "latitude": latitude.toString(),
+        "longitude": longitude.toString(),
       },
     );
 
