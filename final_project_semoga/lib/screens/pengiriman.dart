@@ -121,8 +121,8 @@ class _PengirimanState extends State<Pengiriman> {
       Uri.parse(apiUrl),
       body: {
         "user_id": widget.userID,
-        "latitude": latitude.toString(),
-        "longitude": longitude.toString(),
+        "Latitude": latitude.toString(),
+        "Longitude": longitude.toString(),
       },
     );
 
