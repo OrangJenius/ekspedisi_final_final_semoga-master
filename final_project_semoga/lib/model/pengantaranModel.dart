@@ -9,7 +9,7 @@ class PengantaranModel {
   final String barang_jenis;
   final String client_alamat;
   final String ekspedisi_kota_asal;
-  final int kendaraan_id;
+  final String kendaraan_id;
   final String titik_awal;
   final String titk_akhir;
 
@@ -43,7 +43,7 @@ class PengantaranModel {
       barang_jenis: json['barang_jenis'],
       client_alamat: json['client_alamat'],
       ekspedisi_kota_asal: json['ekspedisi_kota_asal'],
-      kendaraan_id: json['kendaraan_id'],
+      kendaraan_id: json['kendaraan_id'].toString(),
       titik_awal: json['titik_awal'] ?? '',
       titk_akhir: json['destination'] ?? '',
     );

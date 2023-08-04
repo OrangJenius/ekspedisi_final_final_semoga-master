@@ -10,11 +10,9 @@ import 'package:http/http.dart' as http;
 
 class Pengiriman extends StatefulWidget {
   final String userID;
-  final String kendaraan_id;
   final PengantaranModel pengantaranItem;
   Pengiriman({
     required this.userID,
-    required this.kendaraan_id,
     required this.pengantaranItem,
   });
 
@@ -191,7 +189,8 @@ class _PengirimanState extends State<Pengiriman> {
                       context,
                       MaterialPageRoute(
                           builder: (context) => LaporanKerusakan(
-                                kendaraan_id: widget.kendaraan_id,
+                                pengantaranItem: widget.pengantaranItem,
+                                userID: widget.userID,
                               )));
                 },
                 child: Text('Kerusakan'),
