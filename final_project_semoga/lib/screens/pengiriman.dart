@@ -137,6 +137,7 @@ class _PengirimanState extends State<Pengiriman> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Live Location Tracking'),
+        automaticallyImplyLeading: false,
       ),
       body: Column(
         children: [
