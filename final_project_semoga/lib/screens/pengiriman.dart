@@ -116,10 +116,11 @@ class _PengirimanState extends State<Pengiriman> {
   }
 
   Future<void> ambilLokasisekarang(double latitude, double longitude) async {
-    final apiUrl = "http://192.168.1.21:1224/lokasi/${widget.userID}";
+    final apiUrl = "http://192.168.1.21:1224/Lokasi/${widget.userID}";
     final response = await http.put(
       Uri.parse(apiUrl),
       body: {
+        "user_id": widget.userID,
         "latitude": latitude.toString(),
         "longitude": longitude.toString(),
       },
@@ -127,6 +128,8 @@ class _PengirimanState extends State<Pengiriman> {
 
     if (response.statusCode == 200) {
       print("Location updated successfully!");
+      print(latitude.toString());
+      print(longitude.toString());
     } else {
       print("Failed to update location. Status code: ${response.statusCode}");
     }

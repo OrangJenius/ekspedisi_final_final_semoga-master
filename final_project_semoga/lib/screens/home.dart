@@ -135,43 +135,57 @@ class _HomeScreenState extends State<HomeScreen> {
                   final jadwalPengantaran = pengantaranItem.jadwalPengantaran;
                   final tujuan = pengantaranItem.tujuan;
 
-                  return Container(
-                    height: 80,
-                    child: Card(
-                      color: Color.fromARGB(1, 206, 206, 206),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(
-                            16.0), // Atur nilai sesuai keinginan Anda
-                      ),
-                      child: ListTile(
-                        minVerticalPadding: 10.0,
-                        leading: CircleAvatar(
-                          child:
-                              Icon(Icons.image), // Replace with your thumbnail
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DetailPengantaranScreen(
+                            userID: widget.userID,
+                            pengantaranItem: pengantaranItem,
+                          ),
                         ),
-                        title: Text('$orderNumber'),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                                '${jadwalPengantaran.toString()}'), // Use appropriate formatting for DateTime
-                            Text('$tujuan'),
-                          ],
+                      );
+                    },
+                    child: Container(
+                      height: 80,
+                      child: Card(
+                        color: Color.fromARGB(1, 206, 206, 206),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(
+                            16.0,
+                          ), // Set as per your requirement
                         ),
-                        trailing: IconButton(
-                          alignment: Alignment.topCenter,
-                          icon: Icon(Icons.arrow_forward),
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DetailPengantaranScreen(
-                                  userID: widget.userID,
-                                  pengantaranItem: pengantaranItem,
+                        child: ListTile(
+                          minVerticalPadding: 10.0,
+                          leading: CircleAvatar(
+                            child: Icon(
+                                Icons.image), // Replace with your thumbnail
+                          ),
+                          title: Text('$orderNumber'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  '${jadwalPengantaran.toString()}'), // Use appropriate formatting for DateTime
+                              Text('$tujuan'),
+                            ],
+                          ),
+                          trailing: IconButton(
+                            alignment: Alignment.topCenter,
+                            icon: Icon(Icons.arrow_forward),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DetailPengantaranScreen(
+                                    userID: widget.userID,
+                                    pengantaranItem: pengantaranItem,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
