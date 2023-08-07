@@ -24,6 +24,9 @@ class _PengirimanState extends State<Pengiriman> {
   LocationData? _currentLocation;
   late LatLng _srcLoc;
   late LatLng _destLoc;
+  late Location location;
+
+  Timer? _locationTimer;
 
   @override
   void initState() {
@@ -43,17 +46,21 @@ class _PengirimanState extends State<Pengiriman> {
       "latitude": _srcLoc.latitude,
       "longitude": _srcLoc.longitude,
     });
-    _getCurrentLocation();
-    Timer.periodic(Duration(seconds: 10), (timer) {
+    _startLocationUpdates();
+    _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (_currentLocation != null) {
         ambilLokasisekarang(
-            _currentLocation!.latitude!, _currentLocation!.longitude!);
+          _currentLocation!.latitude!,
+          _currentLocation!.longitude!,
+        );
       }
     });
   }
 
-  void _getCurrentLocation() async {
-    Location location = Location();
+  StreamSubscription<LocationData>? _locationSubscription;
+
+  void _startLocationUpdates() async {
+    location = Location();
     bool serviceEnabled;
     PermissionStatus permissionGranted;
 
@@ -75,11 +82,18 @@ class _PengirimanState extends State<Pengiriman> {
       }
     }
 
-    location.onLocationChanged.listen((LocationData newLocation) {
-      setState(() {
-        _currentLocation = newLocation;
-      });
+    _locationSubscription =
+        location.onLocationChanged.listen((LocationData newLocation) {
+      if (mounted) {
+        setState(() {
+          _currentLocation = newLocation;
+        });
+      }
     });
+  }
+
+  void _stopLocationUpdates() {
+    _locationSubscription?.cancel();
   }
 
   void _showSelesaiDialog() {
@@ -92,6 +106,7 @@ class _PengirimanState extends State<Pengiriman> {
           actions: [
             TextButton(
               onPressed: () {
+                dispose();
                 // Close the dialog and navigate back to HomeScreen
                 Navigator.push(
                   context,
@@ -133,6 +148,13 @@ class _PengirimanState extends State<Pengiriman> {
     } else {
       print("Failed to update location. Status code: ${response.statusCode}");
     }
+  }
+
+  @override
+  void dispose() {
+    _locationTimer?.cancel();
+    _stopLocationUpdates(); // Hentikan pemantauan lokasi saat halaman dihancurkan
+    super.dispose();
   }
 
   @override
