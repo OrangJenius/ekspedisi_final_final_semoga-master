@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:final_project_semoga/model/pengantaranModel.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class Pengiriman extends StatefulWidget {
   final String userID;
@@ -27,6 +28,9 @@ class _PengirimanState extends State<Pengiriman> {
   late Location location;
 
   Timer? _locationTimer;
+
+  DateTime? now;
+  String? formattedDate;
 
   @override
   void initState() {
@@ -55,6 +59,8 @@ class _PengirimanState extends State<Pengiriman> {
         );
       }
     });
+    now = DateTime.now();
+    formattedDate = DateFormat('yyyy-MM-dd').format(now!);
   }
 
   StreamSubscription<LocationData>? _locationSubscription;
@@ -106,6 +112,7 @@ class _PengirimanState extends State<Pengiriman> {
           actions: [
             TextButton(
               onPressed: () {
+                postHistory();
                 updateStatus();
                 dispose();
                 // Close the dialog and navigate back to HomeScreen
@@ -159,8 +166,35 @@ class _PengirimanState extends State<Pengiriman> {
       print("Location updated successfully!");
       print(latitude.toString());
       print(longitude.toString());
+      print(formattedDate);
+      print(widget.pengantaranItem.orderNumber);
     } else {
       print("Failed to update location. Status code: ${response.statusCode}");
+    }
+  }
+
+  Future<void> postHistory() async {
+    final apiUrl = 'http://192.168.1.21:1224/inputHistory';
+
+    // Persiapkan data yang akan dikirim dalam bentuk JSON
+
+    try {
+      final response = await http.post(Uri.parse(apiUrl), body: {
+        'ekspedisi_id': widget.pengantaranItem.orderNumber.toString(),
+        'tanggal_sampai': formattedDate,
+      });
+      print(widget.pengantaranItem.orderNumber);
+      print(formattedDate);
+
+      if (response.statusCode == 200) {
+        print('Data berhasil dikirim');
+        print('Response: ${response.body}');
+      } else {
+        print('Gagal mengirim data. Status code: ${response.statusCode}');
+        print('Response: ${response.body}');
+      }
+    } catch (e) {
+      print('Errorrrrrrr: $e');
     }
   }
 
