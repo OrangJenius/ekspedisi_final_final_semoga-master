@@ -34,9 +34,10 @@ class _PengirimanState extends State<Pengiriman> {
 
   DateTime? now;
   String? formattedDate;
+  late SharedPreferences prefs;
 
   Future<void> initializeSharedPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     prefs.setBool('isOnTheWay', true);
     final pengantaranItemJson = json.encode(
         widget.pengantaranItem.toJson()); // Encode pengantaranItem to JSON
@@ -126,6 +127,8 @@ class _PengirimanState extends State<Pengiriman> {
           actions: [
             TextButton(
               onPressed: () {
+                prefs.remove('isOnTheWay');
+                prefs.remove('pengantaran_model');
                 postHistory();
                 updateStatus();
                 dispose();
