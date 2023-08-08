@@ -7,6 +7,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:final_project_semoga/model/pengantaranModel.dart';
 import 'package:http/http.dart' as http;
+import 'dart:math' as math;
 
 class Pengiriman extends StatefulWidget {
   final String userID;
@@ -171,6 +172,30 @@ class _PengirimanState extends State<Pengiriman> {
     super.dispose();
   }
 
+  double calculateDistance(
+    double startLatitude,
+    double startLongitude,
+    double endLatitude,
+    double endLongitude,
+  ) {
+    const int earthRadius = 6371000; // Earth's radius in meters
+
+    final double lat1Rad = startLatitude * (3.141592653589793 / 180);
+    final double lon1Rad = startLongitude * (3.141592653589793 / 180);
+    final double lat2Rad = endLatitude * (3.141592653589793 / 180);
+    final double lon2Rad = endLongitude * (3.141592653589793 / 180);
+
+    final double dLat = lat2Rad - lat1Rad;
+    final double dLon = lon2Rad - lon1Rad;
+
+    final double a = math.pow(math.sin(dLat / 2), 2) +
+        math.cos(lat1Rad) * math.cos(lat2Rad) * math.pow(math.sin(dLon / 2), 2);
+    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    final double distance = earthRadius * c;
+    return distance;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -237,9 +262,25 @@ class _PengirimanState extends State<Pengiriman> {
               ),
               ElevatedButton(
                 onPressed: () {
-                  // Implement the right button's functionality here
-                  // For example, you can show a dialog, navigate to another screen, etc.
-                  _showSelesaiDialog();
+                  if (_currentLocation != null) {
+                    final double distance = calculateDistance(
+                      _currentLocation!.latitude!,
+                      _currentLocation!.longitude!,
+                      _destLoc.latitude,
+                      _destLoc.longitude,
+                    );
+
+                    // Define the desired range in meters
+                    final double desiredRange =
+                        100; // Adjust this value as needed
+
+                    if (distance <= desiredRange) {
+                      _showSelesaiDialog();
+                    } else {
+                      // Show a message or handle the case when the driver is not within range
+                      print("Driver belum sampai.");
+                    }
+                  }
                 },
                 child: Text('Selesai'),
               ),
