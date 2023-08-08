@@ -106,6 +106,7 @@ class _PengirimanState extends State<Pengiriman> {
           actions: [
             TextButton(
               onPressed: () {
+                updateStatus();
                 dispose();
                 // Close the dialog and navigate back to HomeScreen
                 Navigator.push(
@@ -128,6 +129,19 @@ class _PengirimanState extends State<Pengiriman> {
         );
       },
     );
+  }
+
+  Future<void> updateStatus() async {
+    final apiurl =
+        "http://192.168.1.21:1224/updateStatus/${widget.pengantaranItem.orderNumber}";
+    final response =
+        await http.put(Uri.parse(apiurl), body: {"status": "selesai"});
+
+    if (response.statusCode == 200) {
+      print("Status updated successfully!");
+    } else {
+      print("Failed to update status. Status code: ${response.statusCode}");
+    }
   }
 
   Future<void> ambilLokasisekarang(double latitude, double longitude) async {
