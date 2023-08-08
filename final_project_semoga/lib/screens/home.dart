@@ -29,15 +29,35 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchHistoryData(); // Fetch history data from API when the screen initializes
   }
 
+  // Future<List<PengantaranModel>> fetchPengantaranData() async {
+  //   try {
+  //     final response = await http.get(Uri.parse(
+  //         'http://192.168.1.21:1224/DataOrderDriver/${widget.userID}/perjalanan'));
+  //     if (response.statusCode == 200) {
+  //       final jsonData = json.decode(response.body);
+
+  //       for (var item in jsonData['data']) {
+  //         pengantaranData.add(PengantaranModel.fromJson(item));
+  //       }
+  //       print(pengantaranData);
+  //       return pengantaranData;
+  //     } else {
+  //       throw Exception('Failed to load data');
+  //     }
+  //   } catch (e) {
+  //     throw Exception('Error: $e');
+  //   }
+  // }
+
   Future<void> fetchPengantaranData() async {
-    final apiUrl = 'http://192.168.1.21:1224/pengiriman/${widget.userID}';
+    final apiUrl =
+        'http://192.168.1.21:1224/pengiriman/${widget.userID}/perjalanan';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));
 
       if (response.statusCode == 200) {
         // Successfully fetched data from the API
-        // Parse the response body, which should be a list of Map<String, dynamic>
         List<Map<String, dynamic>> apiPengantaranData =
             List<Map<String, dynamic>>.from(jsonDecode(response.body));
         List<PengantaranModel> pengantaranModel = apiPengantaranData
@@ -45,7 +65,6 @@ class _HomeScreenState extends State<HomeScreen> {
             .toList();
         setState(() {
           pengantaranData = pengantaranModel;
-          print(pengantaranData);
         });
       } else {
         // API call failed or returned an error status code
@@ -128,12 +147,9 @@ class _HomeScreenState extends State<HomeScreen> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: pengantaranData.length,
+                itemCount: 3,
                 itemBuilder: (context, index) {
                   final pengantaranItem = pengantaranData[index];
-                  final orderNumber = pengantaranItem.orderNumber;
-                  final jadwalPengantaran = pengantaranItem.jadwalPengantaran;
-                  final tujuan = pengantaranItem.tujuan;
 
                   return GestureDetector(
                     onTap: () {
@@ -162,13 +178,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Icon(
                                 Icons.image), // Replace with your thumbnail
                           ),
-                          title: Text('$orderNumber'),
+                          title: Text(pengantaranItem.orderNumber.toString()),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                  '${jadwalPengantaran.toString()}'), // Use appropriate formatting for DateTime
-                              Text('$tujuan'),
+                              Text(pengantaranItem.jadwalPengantaran
+                                  .toString()), // Use appropriate formatting for DateTime
+                              Text(pengantaranItem.tujuan),
                             ],
                           ),
                           trailing: IconButton(
