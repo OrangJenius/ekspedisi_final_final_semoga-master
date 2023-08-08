@@ -29,26 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchHistoryData(); // Fetch history data from API when the screen initializes
   }
 
-  // Future<List<PengantaranModel>> fetchPengantaranData() async {
-  //   try {
-  //     final response = await http.get(Uri.parse(
-  //         'http://192.168.1.21:1224/DataOrderDriver/${widget.userID}/perjalanan'));
-  //     if (response.statusCode == 200) {
-  //       final jsonData = json.decode(response.body);
-
-  //       for (var item in jsonData['data']) {
-  //         pengantaranData.add(PengantaranModel.fromJson(item));
-  //       }
-  //       print(pengantaranData);
-  //       return pengantaranData;
-  //     } else {
-  //       throw Exception('Failed to load data');
-  //     }
-  //   } catch (e) {
-  //     throw Exception('Error: $e');
-  //   }
-  // }
-
   Future<void> fetchPengantaranData() async {
     final apiUrl =
         'http://192.168.1.21:1224/pengiriman/${widget.userID}/perjalanan';

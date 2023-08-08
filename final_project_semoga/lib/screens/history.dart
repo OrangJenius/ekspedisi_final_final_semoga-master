@@ -84,30 +84,30 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 itemBuilder: (context, index) {
                   final historyItem = widget.historyID[index];
                   final orderNumber = historyItem.orderNumber;
-                  final jadwalPengantaran = historyItem.tanggalPengantaran;
+
                   final tujuan = historyItem.alamatTujuan;
 
                   return Container(
                     height: 80,
                     child: Card(
-                      color: const Color.fromARGB(
-                          1, 206, 206, 206), // Set the desired shade of grey
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(
+                            16.0), // Atur nilai sesuai keinginan Anda
+                      ),
+                      color: Color.fromARGB(1, 206, 206, 206),
                       child: ListTile(
                         minVerticalPadding: 10.0,
                         leading: CircleAvatar(
                           child:
                               Icon(Icons.image), // Replace with your thumbnail
                         ),
-                        title: Text('Order Number: $orderNumber'),
-                        titleTextStyle: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            fontSize: 18),
+                        title: Text('$orderNumber'),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Jadwal Pengantaran: $jadwalPengantaran'),
-                            Text('Tujuan: $tujuan'),
+                            Text(historyItem.tanggalSampai
+                                .toString()), // Use appropriate formatting for DateTime
+                            Text('$tujuan'),
                           ],
                         ),
                         trailing: IconButton(
@@ -124,16 +124,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
                             );
                           },
                         ),
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DetailHistoryScreen(
-                                historyID: historyItem,
-                              ),
-                            ),
-                          );
-                        },
                       ),
                     ),
                   );
