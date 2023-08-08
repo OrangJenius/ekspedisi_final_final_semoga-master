@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
@@ -9,6 +10,7 @@ import 'package:final_project_semoga/model/pengantaranModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Pengiriman extends StatefulWidget {
   final String userID;
@@ -33,9 +35,20 @@ class _PengirimanState extends State<Pengiriman> {
   DateTime? now;
   String? formattedDate;
 
+  Future<void> initializeSharedPreferences() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setBool('isOnTheWay', true);
+    final pengantaranItemJson = json.encode(
+        widget.pengantaranItem.toJson()); // Encode pengantaranItem to JSON
+    print(widget.pengantaranItem);
+    print(pengantaranItemJson);
+    prefs.setString('pengantaran_model', pengantaranItemJson);
+  }
+
   @override
   void initState() {
     super.initState();
+    initializeSharedPreferences();
     String locawalnospace =
         widget.pengantaranItem.titik_awal.replaceAll(" ", "");
     List<String> LatLngawal = locawalnospace.split(",");
@@ -296,6 +309,7 @@ class _PengirimanState extends State<Pengiriman> {
               ),
               ElevatedButton(
                 onPressed: () {
+                  initializeSharedPreferences();
                   if (_currentLocation != null) {
                     final double distance = calculateDistance(
                       _currentLocation!.latitude!,

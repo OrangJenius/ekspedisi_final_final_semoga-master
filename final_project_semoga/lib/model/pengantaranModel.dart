@@ -29,6 +29,24 @@ class PengantaranModel {
     required this.titk_akhir,
   });
 
+  Map<String, dynamic> toJson() {
+    return {
+      'ekspedisi_Id': orderNumber,
+      'ekspedisi_tanggal_pengiriman': jadwalPengantaran.toIso8601String(),
+      'ekspedisi_kota_tujuan': tujuan,
+      'user_nama': user_nama,
+      'client_nama': client_nama,
+      'kendaraan_jenis_kendaraan': kendaraan_jenis_kendaraan,
+      'kendaraan_nomor_plat': kendaraan_nomor_plat,
+      'barang_jenis': barang_jenis,
+      'client_alamat': client_alamat,
+      'ekspedisi_kota_asal': ekspedisi_kota_asal,
+      'kendaraan_id': kendaraan_id,
+      'titik_awal': titik_awal,
+      'destination': titk_akhir,
+    };
+  }
+
   factory PengantaranModel.fromJson(Map<String, dynamic> json) {
     return PengantaranModel(
       orderNumber:
