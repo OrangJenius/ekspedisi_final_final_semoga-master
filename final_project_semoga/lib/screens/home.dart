@@ -207,7 +207,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ListView.builder(
             shrinkWrap: true,
             physics: NeverScrollableScrollPhysics(),
-            itemCount: historyData.length > 3 ? 3 : historyData.length,
+            itemCount: historyData.length > 2 ? 2 : historyData.length,
             itemBuilder: (context, index) {
               final data = historyData[index];
               final orderNumber = data.orderNumber;
