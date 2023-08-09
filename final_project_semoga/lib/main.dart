@@ -67,14 +67,17 @@ class EkspedisiApp extends StatelessWidget {
 
       if (lastScreen) {
         return 'pengiriman|$userID|${json.encode(pengantaranModel)}'; // Pass userID and pengantaranItem JSON to Pengiriman screen
-      } else {
-        bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
-        if (isLoggedIn) {
-          return 'home|$userID';
-        }
+      }
+      bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      if (isLoggedIn) {
+        return 'home|$userID';
+      }
+    } else {
+      bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+      if (isLoggedIn) {
+        return 'home|$userID';
       }
     }
-
     return 'login'; // Return 'login' as the default case
   }
 }
