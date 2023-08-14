@@ -38,7 +38,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchProfile() async {
-    final apiUrl = 'http://192.168.1.21:1224/profile/${widget.userID}';
+    final apiUrl = 'http://116.68.252.201:1224/profile/${widget.userID}';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

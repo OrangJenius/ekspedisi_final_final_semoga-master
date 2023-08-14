@@ -41,7 +41,7 @@ class _LupaPassword2State extends State<LupaPassword2> {
     setState(() {
       _message = '';
     });
-    final apiUrl = 'http://192.168.1.21:1224/forgetPass';
+    final apiUrl = 'http://116.68.252.201:1224/forgetPass';
     final password = _newPasswordController.text;
     bool passwordsMatch = _submitNewPassword();
     print(passwordsMatch); // Print the result here

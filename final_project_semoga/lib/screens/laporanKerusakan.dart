@@ -19,7 +19,7 @@ class _LaporanKerusakanState extends State<LaporanKerusakan> {
   final TextEditingController _laporanKerusakan = TextEditingController();
 
   Future<void> postData() async {
-    final apiUrl = 'http://192.168.1.21:1224/tambahLaporanKerusakan';
+    final apiUrl = 'http://116.68.252.201:1224/tambahLaporanKerusakan';
 
     final laporanKerusakan = _laporanKerusakan.text;
     print(widget.pengantaranItem.kendaraan_id);

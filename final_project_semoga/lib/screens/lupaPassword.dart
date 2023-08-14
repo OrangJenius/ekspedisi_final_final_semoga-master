@@ -28,7 +28,7 @@ class _LupaPasswordState extends State<LupaPassword> {
   List<UserModel> userData = [];
 
   Future<List<UserModel>> cekEmail() async {
-    final apiUrl = 'http://192.168.1.21:1224/user';
+    final apiUrl = 'http://116.68.252.201:1224/user';
 
     try {
       final response = await http.get(Uri.parse(apiUrl));

@@ -157,7 +157,7 @@ class _PengirimanState extends State<Pengiriman> {
 
   Future<void> updateStatus() async {
     final apiurl =
-        "http://192.168.1.21:1224/updateStatus/${widget.pengantaranItem.orderNumber}";
+        "http://116.68.252.201:1224/updateStatus/${widget.pengantaranItem.orderNumber}";
     final response =
         await http.put(Uri.parse(apiurl), body: {"status": "selesai"});
 
@@ -170,7 +170,7 @@ class _PengirimanState extends State<Pengiriman> {
 
   Future<void> ambilLokasisekarang(double latitude, double longitude) async {
     final apiUrl =
-        "http://192.168.1.21:1224/Lokasi/${widget.pengantaranItem.kendaraan_id}";
+        "http://116.68.252.201:1224/Lokasi/${widget.pengantaranItem.kendaraan_id}";
     final response = await http.put(
       Uri.parse(apiUrl),
       body: {
@@ -191,7 +191,7 @@ class _PengirimanState extends State<Pengiriman> {
   }
 
   Future<void> postHistory() async {
-    final apiUrl = 'http://192.168.1.21:1224/inputHistory';
+    final apiUrl = 'http://116.68.252.201:1224/inputHistory';
 
     // Persiapkan data yang akan dikirim dalam bentuk JSON
 

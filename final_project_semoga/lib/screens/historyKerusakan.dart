@@ -16,7 +16,7 @@ class _HistoryKerusakan extends State<HistoryKerusakan> {
   Future<List<ModelHistoryKerusakan>> getKerusakanData() async {
     try {
       final response = await http
-          .get(Uri.parse('http://192.168.1.21:1224/laporanKerusakan'));
+          .get(Uri.parse('http://116.68.252.201:1224/laporanKerusakan'));
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         List<ModelHistoryKerusakan> kerusakanList = [];
