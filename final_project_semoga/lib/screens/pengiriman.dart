@@ -11,6 +11,7 @@ import 'package:http/http.dart' as http;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:background_fetch/background_fetch.dart';
 
 class Pengiriman extends StatefulWidget {
   final String userID;
@@ -76,6 +77,20 @@ class _PengirimanState extends State<Pengiriman> {
     });
     now = DateTime.now();
     formattedDate = DateFormat('yyyy-MM-dd').format(now!);
+
+    BackgroundFetch.configure(
+      BackgroundFetchConfig(
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        enableHeadless: true,
+        startOnBoot: true,
+      ),
+      _backgroundFetchHeadlessTask,
+    ).then((int status) {
+      print('[BackgroundFetch] configure success: $status');
+    }).catchError((e) {
+      print('[BackgroundFetch] configure FAILURE: $e');
+    });
   }
 
   StreamSubscription<LocationData>? _locationSubscription;
@@ -155,6 +170,25 @@ class _PengirimanState extends State<Pengiriman> {
     );
   }
 
+  void _backgroundFetchHeadlessTask(HeadlessTask task) async {
+    if (task.timeout) {
+      BackgroundFetch.finish(task.taskId);
+      return;
+    }
+
+    // Ambil lokasi saat ini
+    Location location = Location();
+    LocationData locationData = await location.getLocation();
+
+    double latitude = locationData.latitude!;
+    double longitude = locationData.longitude!;
+
+    // Kirim lokasi ke server Anda
+    ambilLokasisekarang(latitude, longitude);
+
+    BackgroundFetch.finish(task.taskId);
+  }
+
   Future<void> updateStatus() async {
     final apiurl =
         "http://116.68.252.201:1224/updateStatus/${widget.pengantaranItem.orderNumber}";
@@ -219,6 +253,10 @@ class _PengirimanState extends State<Pengiriman> {
   void dispose() {
     _locationTimer?.cancel();
     _stopLocationUpdates(); // Hentikan pemantauan lokasi saat halaman dihancurkan
+    _locationSubscription?.cancel();
+    BackgroundFetch.stop().then((status) {
+      print('[BackgroundFetch] stop success: $status');
+    });
     super.dispose();
   }
 
