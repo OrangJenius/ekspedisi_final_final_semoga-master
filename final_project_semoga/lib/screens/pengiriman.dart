@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 import 'package:final_project_semoga/model/pengantaranModel.dart';
@@ -48,9 +49,35 @@ class _PengirimanState extends State<Pengiriman> {
     prefs.setBool('isOnTheWay', true);
     final pengantaranItemJson = json.encode(
         widget.pengantaranItem.toJson()); // Encode pengantaranItem to JSON
-    print(widget.pengantaranItem);
-    print(pengantaranItemJson);
+    //print(widget.pengantaranItem);
+    //print(pengantaranItemJson);
     prefs.setString('pengantaran_model', pengantaranItemJson);
+  }
+
+  List<LatLng> polylineCoordinates = [];
+  void getPolyPoints(LatLng _srcLoc, LatLng _destLoc) async {
+    print('${[
+      _srcLoc.latitude,
+      _srcLoc.longitude,
+      _destLoc.latitude,
+      _destLoc.longitude
+    ]}');
+    PolylinePoints polylinePoints = PolylinePoints();
+    PolylineResult result = await polylinePoints.getRouteBetweenCoordinates(
+      "AIzaSyAw7Gj3WE8jEDCnCVAJxayFnf2wWD8WQTQ",
+      PointLatLng(_srcLoc.latitude, _srcLoc.longitude),
+      PointLatLng(_destLoc.latitude, _destLoc.longitude),
+    );
+    print('"HORE"${result.points.isEmpty} "hore"');
+    if (result.points.isNotEmpty) {
+      print('hore');
+      result.points.forEach(
+        (PointLatLng point) => polylineCoordinates.add(
+          LatLng(point.latitude, point.longitude),
+        ),
+      );
+      setState(() {});
+    }
   }
 
   @override
@@ -68,10 +95,12 @@ class _PengirimanState extends State<Pengiriman> {
     _destLoc =
         LatLng(double.parse(LatLngAkhir[0]), double.parse(LatLngAkhir[1]));
 
-    _currentLocation = LocationData.fromMap({
-      "latitude": _srcLoc.latitude,
-      "longitude": _srcLoc.longitude,
-    });
+    // _currentLocation = LocationData.fromMap({
+    //   "latitude": _srcLoc.latitude,
+    //   "longitude": _srcLoc.longitude,
+    // });
+
+    _startLocationUpdates();
 
     // location.getLocation().then((locationData) {
     //   setState(() {
@@ -132,6 +161,7 @@ class _PengirimanState extends State<Pengiriman> {
         destinationMarkerIcon = descriptor;
       });
     });
+    getPolyPoints(_srcLoc, _destLoc);
   }
 
   StreamSubscription<LocationData>? _locationSubscription;
@@ -367,6 +397,14 @@ class _PengirimanState extends State<Pengiriman> {
                         icon: destinationMarkerIcon!,
                         infoWindow:
                             const InfoWindow(title: 'Destination Location'),
+                      ),
+                    },
+                    polylines: {
+                      Polyline(
+                        polylineId: const PolylineId("route"),
+                        points: polylineCoordinates,
+                        color: const Color(0xFF7B61FF),
+                        width: 6,
                       ),
                     },
                     onMapCreated: (GoogleMapController controller) {
