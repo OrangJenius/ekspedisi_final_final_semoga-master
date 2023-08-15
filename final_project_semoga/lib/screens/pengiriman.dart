@@ -342,18 +342,20 @@ class _PengirimanState extends State<Pengiriman> {
                           _currentLocation!.longitude!,
                         ),
                         infoWindow: const InfoWindow(title: 'Current Location'),
-                        icon: sourceMarkerIcon!,
+                        icon: customMarkerIcon!,
                       ),
                       Marker(
                         markerId: const MarkerId('source'),
                         position: _srcLoc,
                         infoWindow: const InfoWindow(title: 'Source Location'),
+                        icon: sourceMarkerIcon!,
                       ),
                       Marker(
                         markerId: const MarkerId('destination'),
                         position: _destLoc,
                         infoWindow:
                             const InfoWindow(title: 'Destination Location'),
+                        icon: destinationMarkerIcon!,
                       ),
                     },
                     onMapCreated: (GoogleMapController controller) {
