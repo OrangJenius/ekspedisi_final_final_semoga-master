@@ -320,6 +320,7 @@ class _PengirimanState extends State<Pengiriman> {
       appBar: AppBar(
         title: const Text('Live Location Tracking'),
         automaticallyImplyLeading: false,
+        leading: BackButton(onPressed: null),
       ),
       body: Column(
         children: [
