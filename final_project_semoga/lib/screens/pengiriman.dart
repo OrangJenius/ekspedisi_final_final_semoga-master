@@ -35,12 +35,6 @@ class _PengirimanState extends State<Pengiriman> {
 
   DateTime? now;
   String? formattedDate;
-
-// Create custom marker icons
-  BitmapDescriptor? customMarkerIcon;
-  BitmapDescriptor? sourceMarkerIcon;
-  BitmapDescriptor? destinationMarkerIcon;
-
   late SharedPreferences prefs;
 
   Future<void> initializeSharedPreferences() async {
@@ -72,13 +66,6 @@ class _PengirimanState extends State<Pengiriman> {
       "latitude": _srcLoc.latitude,
       "longitude": _srcLoc.longitude,
     });
-
-    // location.getLocation().then((locationData) {
-    //   setState(() {
-    //     _currentLocation = locationData;
-    //   });
-    // });
-
     _startLocationUpdates();
     _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (_currentLocation != null) {
@@ -103,34 +90,6 @@ class _PengirimanState extends State<Pengiriman> {
       print('[BackgroundFetch] configure success: $status');
     }).catchError((e) {
       print('[BackgroundFetch] configure FAILURE: $e');
-    });
-
-    // Load marker assets
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 1),
-      'assets/currentLocation.png', // Replace with your asset path
-    ).then((descriptor) {
-      setState(() {
-        customMarkerIcon = descriptor;
-      });
-    });
-
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 1),
-      'assets/sourceLocation.png', // Replace with your asset path
-    ).then((descriptor) {
-      setState(() {
-        sourceMarkerIcon = descriptor;
-      });
-    });
-
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 1),
-      'assets/destinationLocation.png', // Replace with your asset path
-    ).then((descriptor) {
-      setState(() {
-        destinationMarkerIcon = descriptor;
-      });
     });
   }
 
@@ -352,19 +311,16 @@ class _PengirimanState extends State<Pengiriman> {
                           _currentLocation!.latitude!,
                           _currentLocation!.longitude!,
                         ),
-                        icon: customMarkerIcon!,
                         infoWindow: const InfoWindow(title: 'Current Location'),
                       ),
                       Marker(
                         markerId: const MarkerId('source'),
                         position: _srcLoc,
-                        icon: sourceMarkerIcon!,
                         infoWindow: const InfoWindow(title: 'Source Location'),
                       ),
                       Marker(
                         markerId: const MarkerId('destination'),
                         position: _destLoc,
-                        icon: destinationMarkerIcon!,
                         infoWindow:
                             const InfoWindow(title: 'Destination Location'),
                       ),

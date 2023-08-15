@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
+
     <application
         android:label="final_project_semoga"
         android:name="${applicationName}"
@@ -37,9 +38,7 @@
             android:value="2" />
         <meta-data android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAw7Gj3WE8jEDCnCVAJxayFnf2wWD8WQTQ" />
-        <service android:name="com.transistorsoft.flutter.backgroundfetch.HeadlessTask"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="false" />
+
 
     </application>
 </manifest>
