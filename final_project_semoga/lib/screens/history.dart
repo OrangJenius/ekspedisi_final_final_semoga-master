@@ -16,6 +16,20 @@ class HistoryScreen extends StatefulWidget {
 class _HistoryScreenState extends State<HistoryScreen> {
   String? selectedFilter = 'Filter By';
 
+  List<HistoryModel> sortHistoryList(String filter) {
+    List<HistoryModel> sortedList = List.from(widget.historyID);
+
+    if (filter == 'By Date') {
+      sortedList.sort((a, b) => a.tanggalSampai.compareTo(b.tanggalSampai));
+    } else if (filter == 'By Destination') {
+      sortedList.sort((a, b) => a.alamatTujuan.compareTo(b.alamatTujuan));
+    } else if (filter == 'By Order Name') {
+      sortedList.sort((a, b) => a.orderNumber.compareTo(b.orderNumber));
+    }
+
+    return sortedList;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,13 +94,11 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: widget.historyID.length,
+                itemCount: sortHistoryList(selectedFilter!).length,
                 itemBuilder: (context, index) {
-                  final historyItem = widget.historyID[index];
+                  final historyItem = sortHistoryList(selectedFilter!)[index];
                   final orderNumber = historyItem.orderNumber;
-
                   final tujuan = historyItem.alamatTujuan;
-
                   return Container(
                     height: 80,
                     child: Card(

@@ -72,6 +72,13 @@ class _PengirimanState extends State<Pengiriman> {
       "latitude": _srcLoc.latitude,
       "longitude": _srcLoc.longitude,
     });
+
+    // location.getLocation().then((locationData) {
+    //   setState(() {
+    //     _currentLocation = locationData;
+    //   });
+    // });
+
     _startLocationUpdates();
     _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (_currentLocation != null) {
