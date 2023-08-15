@@ -36,6 +36,9 @@ class _PengirimanState extends State<Pengiriman> {
   DateTime? now;
   String? formattedDate;
   late SharedPreferences prefs;
+  BitmapDescriptor? customMarkerIcon;
+  BitmapDescriptor? sourceMarkerIcon;
+  BitmapDescriptor? destinationMarkerIcon;
 
   Future<void> initializeSharedPreferences() async {
     prefs = await SharedPreferences.getInstance();
@@ -90,6 +93,33 @@ class _PengirimanState extends State<Pengiriman> {
       print('[BackgroundFetch] configure success: $status');
     }).catchError((e) {
       print('[BackgroundFetch] configure FAILURE: $e');
+    });
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 1),
+      'assets/currentLocation.png', // Replace with your asset path
+    ).then((descriptor) {
+      setState(() {
+        customMarkerIcon = descriptor;
+      });
+    });
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 1),
+      'assets/sourceLocation.png', // Replace with your asset path
+    ).then((descriptor) {
+      setState(() {
+        sourceMarkerIcon = descriptor;
+      });
+    });
+
+    BitmapDescriptor.fromAssetImage(
+      ImageConfiguration(devicePixelRatio: 1),
+      'assets/destinationLocation.png', // Replace with your asset path
+    ).then((descriptor) {
+      setState(() {
+        destinationMarkerIcon = descriptor;
+      });
     });
   }
 
@@ -312,6 +342,7 @@ class _PengirimanState extends State<Pengiriman> {
                           _currentLocation!.longitude!,
                         ),
                         infoWindow: const InfoWindow(title: 'Current Location'),
+                        icon: sourceMarkerIcon!,
                       ),
                       Marker(
                         markerId: const MarkerId('source'),
