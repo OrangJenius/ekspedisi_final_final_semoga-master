@@ -6,15 +6,20 @@ import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart' as loc;
+
 import 'package:final_project_semoga/model/pengantaranModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart' as perm;
+//import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+import 'package:geolocator/geolocator.dart';
+
+String? globalUserID = _PengirimanState().widget.userID;
+PengantaranModel? globalPengantaranItem =
+    _PengirimanState().widget.pengantaranItem;
 
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
@@ -27,7 +32,6 @@ Future<bool> onIosBackground(ServiceInstance service) async {
 @pragma('vm:entry-point')
 Future<void> onStart(ServiceInstance service) async {
   DartPluginRegistrant.ensureInitialized();
-  final pengirimanState = _PengirimanState();
 
   if (service is AndroidServiceInstance) {
     service.on('setAsForeground').listen((event) {
@@ -43,22 +47,30 @@ Future<void> onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  // Membuat instance _PengirimanState
-
-  pengirimanState._startLocationUpdates();
-
   Timer.periodic(Duration(seconds: 10), (timer) {
-    if (pengirimanState._currentLocation != null) {
-      pengirimanState.ambilLokasisekarang(
-        pengirimanState._currentLocation!.latitude!,
-        pengirimanState._currentLocation!.longitude!,
-      );
-      print("berjalannnnnnn hahahhahah2");
-    }
-    print("berjalannnnnnn hahahhahah3");
+    //tempat untuk update lokasi ke rest api ketika berjalan di background
+    getLocation();
+    print("berjalannnnnnn hahahhahah2");
   });
 
   print("berjalannnnnnn hahahhahah");
+}
+
+Future<void> getLocation() async {
+  Position position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.bestForNavigation);
+
+  final apiUrl =
+      "http://116.68.252.201:1224/Lokasi/${globalPengantaranItem!.kendaraan_id}";
+  final response = await http.put(
+    Uri.parse(apiUrl),
+    body: {
+      "Latitude": position.latitude.toString(),
+      "Longitude": position.longitude.toString(),
+    },
+  );
+  if (response.statusCode == 200) {
+  } else {}
 }
 
 class Pengiriman extends StatefulWidget {
@@ -74,10 +86,9 @@ class Pengiriman extends StatefulWidget {
 }
 
 class _PengirimanState extends State<Pengiriman> {
-  loc.LocationData? _currentLocation;
+  Position? _currentLocation;
   late LatLng _srcLoc;
   late LatLng _destLoc;
-  late loc.Location location;
 
   DateTime? now;
   String? formattedDate;
@@ -85,7 +96,6 @@ class _PengirimanState extends State<Pengiriman> {
   BitmapDescriptor? customMarkerIcon;
   BitmapDescriptor? sourceMarkerIcon;
   BitmapDescriptor? destinationMarkerIcon;
-  StreamSubscription<loc.LocationData>? _locationSubscription;
 
   Timer? _locationTimer;
 
@@ -105,6 +115,9 @@ class _PengirimanState extends State<Pengiriman> {
     initializeSharedPreferences();
     initializeService();
     FlutterBackgroundService().invoke("setAsForeground");
+
+    // globalPengantaranItem = widget.pengantaranItem;
+    // globalUserID = widget.userID;
     String locawalnospace =
         widget.pengantaranItem.titik_awal.replaceAll(" ", "");
     List<String> LatLngawal = locawalnospace.split(",");
@@ -120,8 +133,8 @@ class _PengirimanState extends State<Pengiriman> {
     _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (_currentLocation != null) {
         ambilLokasisekarang(
-          _currentLocation!.latitude!,
-          _currentLocation!.longitude!,
+          _currentLocation!.latitude,
+          _currentLocation!.longitude,
         );
       }
     });
@@ -187,44 +200,35 @@ class _PengirimanState extends State<Pengiriman> {
   }
 
   void _startLocationUpdates() async {
-    location = loc.Location();
-
-    // Request the first permission
     bool serviceEnabled;
-    // Check if the first permission is granted before proceeding
-    serviceEnabled = await location.serviceEnabled();
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      serviceEnabled = await location.requestService();
-      if (!serviceEnabled) {
+      // Handle case when location services are disabled
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.deniedForever) {
+      // Handle case when permission is permanently denied
+      return;
+    }
+
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission != LocationPermission.whileInUse &&
+          permission != LocationPermission.always) {
+        // Handle case when permission is denied
         return;
       }
     }
-    // Now request the second permission
-    perm.PermissionStatus locationAlwaysStatus =
-        await perm.Permission.location.request();
 
-    // Check if the second permission is granted before proceeding
-    if (locationAlwaysStatus.isGranted) {
-      perm.PermissionStatus locationAlways =
-          await perm.Permission.locationAlways.request();
-
-      if (locationAlways.isGranted) {
-        _locationSubscription =
-            location.onLocationChanged.listen((loc.LocationData newLocation) {
-          if (mounted) {
-            setState(() {
-              _currentLocation = newLocation;
-            });
-          }
-        });
-      }
-    } else {
-      // Handle the case where location always permission is not granted
-    }
-  }
-
-  void _stopLocationUpdates() {
-    _locationSubscription?.cancel();
+    Geolocator.getPositionStream().listen((Position newPosition) {
+      setState(() {
+        _currentLocation = newPosition;
+      });
+    });
   }
 
   void _showSelesaiDialog() {
@@ -242,7 +246,7 @@ class _PengirimanState extends State<Pengiriman> {
                 postHistory();
                 updateStatus();
                 _locationTimer?.cancel();
-                _stopLocationUpdates();
+                // _stopLocationUpdates();
 
                 Navigator.push(
                   context,
@@ -361,7 +365,7 @@ class _PengirimanState extends State<Pengiriman> {
       appBar: AppBar(
         title: const Text('Live Location Tracking'),
         automaticallyImplyLeading: false,
-        leading: const BackButton(onPressed: null),
+        //leading: const BackButton(onPressed: null),
       ),
       body: Column(
         children: [
@@ -371,8 +375,8 @@ class _PengirimanState extends State<Pengiriman> {
                 : GoogleMap(
                     initialCameraPosition: CameraPosition(
                       target: LatLng(
-                        _currentLocation!.latitude!,
-                        _currentLocation!.longitude!,
+                        _currentLocation!.latitude,
+                        _currentLocation!.longitude,
                       ),
                       zoom: 13.5,
                     ),
@@ -380,8 +384,8 @@ class _PengirimanState extends State<Pengiriman> {
                       Marker(
                         markerId: const MarkerId('currentLocation'),
                         position: LatLng(
-                          _currentLocation!.latitude!,
-                          _currentLocation!.longitude!,
+                          _currentLocation!.latitude,
+                          _currentLocation!.longitude,
                         ),
                         infoWindow: const InfoWindow(title: 'Current Location'),
                       ),
@@ -427,8 +431,8 @@ class _PengirimanState extends State<Pengiriman> {
                   initializeSharedPreferences();
                   if (_currentLocation != null) {
                     final double distance = calculateDistance(
-                      _currentLocation!.latitude!,
-                      _currentLocation!.longitude!,
+                      _currentLocation!.latitude,
+                      _currentLocation!.longitude,
                       _destLoc.latitude,
                       _destLoc.longitude,
                     );
