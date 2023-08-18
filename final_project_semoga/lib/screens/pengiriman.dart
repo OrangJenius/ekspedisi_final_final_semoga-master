@@ -1,17 +1,65 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as loc;
 import 'package:final_project_semoga/model/pengantaranModel.dart';
 import 'package:http/http.dart' as http;
 import 'dart:math' as math;
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart' as perm;
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:background_fetch/background_fetch.dart';
+import 'package:flutter_background_service/flutter_background_service.dart';
+import 'package:flutter_background_service_android/flutter_background_service_android.dart';
+
+@pragma('vm:entry-point')
+Future<bool> onIosBackground(ServiceInstance service) async {
+  WidgetsFlutterBinding.ensureInitialized();
+  DartPluginRegistrant.ensureInitialized();
+
+  return true;
+}
+
+@pragma('vm:entry-point')
+Future<void> onStart(ServiceInstance service) async {
+  DartPluginRegistrant.ensureInitialized();
+  final pengirimanState = _PengirimanState();
+
+  if (service is AndroidServiceInstance) {
+    service.on('setAsForeground').listen((event) {
+      service.setAsForegroundService();
+    });
+
+    service.on('setAsBackground').listen((event) {
+      service.setAsBackgroundService();
+    });
+  }
+
+  service.on('stopService').listen((event) {
+    service.stopSelf();
+  });
+
+  // Membuat instance _PengirimanState
+
+  pengirimanState._startLocationUpdates();
+
+  Timer.periodic(Duration(seconds: 10), (timer) {
+    if (pengirimanState._currentLocation != null) {
+      pengirimanState.ambilLokasisekarang(
+        pengirimanState._currentLocation!.latitude!,
+        pengirimanState._currentLocation!.longitude!,
+      );
+      print("berjalannnnnnn hahahhahah2");
+    }
+    print("berjalannnnnnn hahahhahah3");
+  });
+
+  print("berjalannnnnnn hahahhahah");
+}
 
 class Pengiriman extends StatefulWidget {
   final String userID;
@@ -26,12 +74,10 @@ class Pengiriman extends StatefulWidget {
 }
 
 class _PengirimanState extends State<Pengiriman> {
-  LocationData? _currentLocation;
+  loc.LocationData? _currentLocation;
   late LatLng _srcLoc;
   late LatLng _destLoc;
-  late Location location;
-
-  Timer? _locationTimer;
+  late loc.Location location;
 
   DateTime? now;
   String? formattedDate;
@@ -39,6 +85,9 @@ class _PengirimanState extends State<Pengiriman> {
   BitmapDescriptor? customMarkerIcon;
   BitmapDescriptor? sourceMarkerIcon;
   BitmapDescriptor? destinationMarkerIcon;
+  StreamSubscription<loc.LocationData>? _locationSubscription;
+
+  Timer? _locationTimer;
 
   Future<void> initializeSharedPreferences() async {
     prefs = await SharedPreferences.getInstance();
@@ -54,6 +103,8 @@ class _PengirimanState extends State<Pengiriman> {
   void initState() {
     super.initState();
     initializeSharedPreferences();
+    initializeService();
+    FlutterBackgroundService().invoke("setAsForeground");
     String locawalnospace =
         widget.pengantaranItem.titik_awal.replaceAll(" ", "");
     List<String> LatLngawal = locawalnospace.split(",");
@@ -65,10 +116,6 @@ class _PengirimanState extends State<Pengiriman> {
     _destLoc =
         LatLng(double.parse(LatLngAkhir[0]), double.parse(LatLngAkhir[1]));
 
-    _currentLocation = LocationData.fromMap({
-      "latitude": _srcLoc.latitude,
-      "longitude": _srcLoc.longitude,
-    });
     _startLocationUpdates();
     _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
       if (_currentLocation != null) {
@@ -78,22 +125,9 @@ class _PengirimanState extends State<Pengiriman> {
         );
       }
     });
+
     now = DateTime.now();
     formattedDate = DateFormat('yyyy-MM-dd').format(now!);
-
-    BackgroundFetch.configure(
-      BackgroundFetchConfig(
-        minimumFetchInterval: 15,
-        stopOnTerminate: false,
-        enableHeadless: true,
-        startOnBoot: true,
-      ),
-      _backgroundFetchHeadlessTask,
-    ).then((int status) {
-      print('[BackgroundFetch] configure success: $status');
-    }).catchError((e) {
-      print('[BackgroundFetch] configure FAILURE: $e');
-    });
 
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 1),
@@ -123,39 +157,68 @@ class _PengirimanState extends State<Pengiriman> {
     });
   }
 
-  StreamSubscription<LocationData>? _locationSubscription;
+  Future<void> initializeService() async {
+    final service = FlutterBackgroundService();
+
+    await service.configure(
+      androidConfiguration: AndroidConfiguration(
+        // this will be executed when app is in foreground or background in separated isolate
+        onStart: onStart,
+        autoStartOnBoot: true,
+        // auto start service
+        autoStart: true,
+        isForegroundMode: true,
+
+        foregroundServiceNotificationId: 888,
+      ),
+      iosConfiguration: IosConfiguration(
+        // auto start service
+        autoStart: true,
+
+        // this will be executed when app is in foreground in separated isolate
+        onForeground: onStart,
+
+        // you have to enable background fetch capability on xcode project
+        onBackground: onIosBackground,
+      ),
+    );
+
+    service.startService();
+  }
 
   void _startLocationUpdates() async {
-    location = Location();
-    bool serviceEnabled;
-    PermissionStatus permissionGranted;
+    location = loc.Location();
 
+    // Request the first permission
+    bool serviceEnabled;
+    // Check if the first permission is granted before proceeding
     serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
-        // Handle if location service is not enabled by the user
         return;
       }
     }
+    // Now request the second permission
+    perm.PermissionStatus locationAlwaysStatus =
+        await perm.Permission.locationAlways.request();
 
-    permissionGranted = await location.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await location.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        // Handle if location permission is not granted by the user
-        return;
-      }
+    // Check if the second permission is granted before proceeding
+    if (locationAlwaysStatus.isGranted) {
+      _locationSubscription =
+          location.onLocationChanged.listen((loc.LocationData newLocation) {
+        if (mounted) {
+          setState(() {
+            _currentLocation = newLocation;
+          });
+        }
+      });
+    } else {
+      // Handle the case where location always permission is not granted
     }
-
-    _locationSubscription =
-        location.onLocationChanged.listen((LocationData newLocation) {
-      if (mounted) {
-        setState(() {
-          _currentLocation = newLocation;
-        });
-      }
-    });
+    {
+      // Handle the case where location when in use permission is not granted
+    }
   }
 
   void _stopLocationUpdates() {
@@ -176,21 +239,23 @@ class _PengirimanState extends State<Pengiriman> {
                 prefs.remove('pengantaran_model');
                 postHistory();
                 updateStatus();
-                dispose();
-                // Close the dialog and navigate back to HomeScreen
+                _locationTimer?.cancel();
+                _stopLocationUpdates();
+
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => HomeScreen(
-                            userID: widget.userID,
-                          )),
+                    builder: (context) => HomeScreen(
+                      userID: widget.userID,
+                    ),
+                  ),
                 );
               },
               child: Text("Ya"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close the dialog
+                Navigator.pop(context);
               },
               child: Text("Tidak"),
             ),
@@ -198,25 +263,6 @@ class _PengirimanState extends State<Pengiriman> {
         );
       },
     );
-  }
-
-  void _backgroundFetchHeadlessTask(HeadlessTask task) async {
-    if (task.timeout) {
-      BackgroundFetch.finish(task.taskId);
-      return;
-    }
-
-    // Ambil lokasi saat ini
-    Location location = Location();
-    LocationData locationData = await location.getLocation();
-
-    double latitude = locationData.latitude!;
-    double longitude = locationData.longitude!;
-
-    // Kirim lokasi ke server Anda
-    ambilLokasisekarang(latitude, longitude);
-
-    BackgroundFetch.finish(task.taskId);
   }
 
   Future<void> updateStatus() async {
@@ -257,12 +303,10 @@ class _PengirimanState extends State<Pengiriman> {
   Future<void> postHistory() async {
     final apiUrl = 'http://116.68.252.201:1224/inputHistory';
 
-    // Persiapkan data yang akan dikirim dalam bentuk JSON
-
     try {
       final response = await http.post(Uri.parse(apiUrl), body: {
         'ekspedisi_id': widget.pengantaranItem.orderNumber.toString(),
-        'tanggal_sampai': formattedDate,
+        'tanggal_sampai': formattedDate!,
       });
       print(widget.pengantaranItem.orderNumber);
       print(formattedDate);
@@ -279,16 +323,11 @@ class _PengirimanState extends State<Pengiriman> {
     }
   }
 
-  @override
-  void dispose() {
-    _locationTimer?.cancel();
-    _stopLocationUpdates(); // Hentikan pemantauan lokasi saat halaman dihancurkan
-    _locationSubscription?.cancel();
-    BackgroundFetch.stop().then((status) {
-      print('[BackgroundFetch] stop success: $status');
-    });
-    super.dispose();
-  }
+  // @override
+  // void dispose() {
+  //   FlutterBackgroundService().invoke("setAsBackground");
+  //   super.dispose();
+  // }
 
   double calculateDistance(
     double startLatitude,
@@ -296,7 +335,7 @@ class _PengirimanState extends State<Pengiriman> {
     double endLatitude,
     double endLongitude,
   ) {
-    const int earthRadius = 6371000; // Earth's radius in meters
+    const int earthRadius = 6371000;
 
     final double lat1Rad = startLatitude * (3.141592653589793 / 180);
     final double lon1Rad = startLongitude * (3.141592653589793 / 180);
@@ -320,7 +359,7 @@ class _PengirimanState extends State<Pengiriman> {
       appBar: AppBar(
         title: const Text('Live Location Tracking'),
         automaticallyImplyLeading: false,
-        leading: BackButton(onPressed: null),
+        leading: const BackButton(onPressed: null),
       ),
       body: Column(
         children: [
@@ -343,20 +382,17 @@ class _PengirimanState extends State<Pengiriman> {
                           _currentLocation!.longitude!,
                         ),
                         infoWindow: const InfoWindow(title: 'Current Location'),
-                        icon: customMarkerIcon!,
                       ),
                       Marker(
                         markerId: const MarkerId('source'),
                         position: _srcLoc,
                         infoWindow: const InfoWindow(title: 'Source Location'),
-                        icon: sourceMarkerIcon!,
                       ),
                       Marker(
                         markerId: const MarkerId('destination'),
                         position: _destLoc,
                         infoWindow:
                             const InfoWindow(title: 'Destination Location'),
-                        icon: destinationMarkerIcon!,
                       ),
                     },
                     onMapCreated: (GoogleMapController controller) {
@@ -373,12 +409,14 @@ class _PengirimanState extends State<Pengiriman> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => LaporanKerusakan(
-                                pengantaranItem: widget.pengantaranItem,
-                                userID: widget.userID,
-                              )));
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LaporanKerusakan(
+                        pengantaranItem: widget.pengantaranItem,
+                        userID: widget.userID,
+                      ),
+                    ),
+                  );
                 },
                 child: Text('Kerusakan'),
               ),
@@ -393,14 +431,11 @@ class _PengirimanState extends State<Pengiriman> {
                       _destLoc.longitude,
                     );
 
-                    // Define the desired range in meters
-                    final double desiredRange =
-                        100; // Adjust this value as needed
+                    final double desiredRange = 100;
 
                     if (distance <= desiredRange) {
                       _showSelesaiDialog();
                     } else {
-                      // Show a message or handle the case when the driver is not within range
                       print("Driver belum sampai.");
                     }
                   }
