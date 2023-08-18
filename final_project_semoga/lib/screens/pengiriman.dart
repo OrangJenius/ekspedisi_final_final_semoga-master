@@ -201,23 +201,25 @@ class _PengirimanState extends State<Pengiriman> {
     }
     // Now request the second permission
     perm.PermissionStatus locationAlwaysStatus =
-        await perm.Permission.locationAlways.request();
+        await perm.Permission.location.request();
 
     // Check if the second permission is granted before proceeding
     if (locationAlwaysStatus.isGranted) {
-      _locationSubscription =
-          location.onLocationChanged.listen((loc.LocationData newLocation) {
-        if (mounted) {
-          setState(() {
-            _currentLocation = newLocation;
-          });
-        }
-      });
+      perm.PermissionStatus locationAlways =
+          await perm.Permission.locationAlways.request();
+
+      if (locationAlways.isGranted) {
+        _locationSubscription =
+            location.onLocationChanged.listen((loc.LocationData newLocation) {
+          if (mounted) {
+            setState(() {
+              _currentLocation = newLocation;
+            });
+          }
+        });
+      }
     } else {
       // Handle the case where location always permission is not granted
-    }
-    {
-      // Handle the case where location when in use permission is not granted
     }
   }
 
