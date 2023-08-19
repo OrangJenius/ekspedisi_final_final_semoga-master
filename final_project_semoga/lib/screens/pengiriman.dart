@@ -17,9 +17,8 @@ import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:geolocator/geolocator.dart';
 
-String? globalUserID = _PengirimanState().widget.userID;
-PengantaranModel? globalPengantaranItem =
-    _PengirimanState().widget.pengantaranItem;
+String? globalUserID;
+PengantaranModel? globalPengantaranItem;
 
 @pragma('vm:entry-point')
 Future<bool> onIosBackground(ServiceInstance service) async {
@@ -57,11 +56,27 @@ Future<void> onStart(ServiceInstance service) async {
 }
 
 Future<void> getLocation() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String pengantaranItemJson = prefs.getString('pengantaran_model') ?? '';
+
+  // Melakukan decode JSON String ke Map (jika tidak kosong)
+  Map<String, dynamic> pengantaranItemMap = {};
+  if (pengantaranItemJson.isNotEmpty) {
+    pengantaranItemMap = json.decode(pengantaranItemJson);
+  }
+  PengantaranModel pengantaranItem =
+      PengantaranModel.fromJson(pengantaranItemMap);
+
   Position position = await Geolocator.getCurrentPosition(
       desiredAccuracy: LocationAccuracy.bestForNavigation);
 
+  // Position current;
+  // Geolocator.getPositionStream().listen((Position newPosition) {
+  //   current = newPosition;
+  // });
+
   final apiUrl =
-      "http://116.68.252.201:1224/Lokasi/${globalPengantaranItem!.kendaraan_id}";
+      "http://116.68.252.201:1224/Lokasi/${pengantaranItem.kendaraan_id}";
   final response = await http.put(
     Uri.parse(apiUrl),
     body: {
@@ -113,11 +128,11 @@ class _PengirimanState extends State<Pengiriman> {
   void initState() {
     super.initState();
     initializeSharedPreferences();
+    globalPengantaranItem = widget.pengantaranItem;
+    globalUserID = widget.userID;
     initializeService();
     FlutterBackgroundService().invoke("setAsForeground");
 
-    // globalPengantaranItem = widget.pengantaranItem;
-    // globalUserID = widget.userID;
     String locawalnospace =
         widget.pengantaranItem.titik_awal.replaceAll(" ", "");
     List<String> LatLngawal = locawalnospace.split(",");
@@ -130,7 +145,7 @@ class _PengirimanState extends State<Pengiriman> {
         LatLng(double.parse(LatLngAkhir[0]), double.parse(LatLngAkhir[1]));
 
     _startLocationUpdates();
-    _locationTimer = Timer.periodic(Duration(seconds: 10), (timer) {
+    _locationTimer = Timer.periodic(Duration(seconds: 5), (timer) {
       if (_currentLocation != null) {
         ambilLokasisekarang(
           _currentLocation!.latitude,
@@ -246,6 +261,7 @@ class _PengirimanState extends State<Pengiriman> {
                 postHistory();
                 updateStatus();
                 _locationTimer?.cancel();
+                FlutterBackgroundService().invoke("stopService");
                 // _stopLocationUpdates();
 
                 Navigator.push(
