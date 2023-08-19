@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
+import 'package:android_intent_plus/android_intent.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
@@ -128,8 +130,6 @@ class _PengirimanState extends State<Pengiriman> {
   void initState() {
     super.initState();
     initializeSharedPreferences();
-    globalPengantaranItem = widget.pengantaranItem;
-    globalUserID = widget.userID;
     initializeService();
     FlutterBackgroundService().invoke("setAsForeground");
 
@@ -220,14 +220,46 @@ class _PengirimanState extends State<Pengiriman> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      // Handle case when location services are disabled
+      final AndroidIntent intent = AndroidIntent(
+        action: 'android.settings.LOCATION_SOURCE_SETTINGS',
+      );
+      await intent.launch();
       return;
     }
 
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
       // Handle case when permission is permanently denied
-      return;
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Izin Lokasi Ditolak"),
+            content: Text(
+                "Izin lokasi ditolak secara permanen. Silakan buka Pengaturan untuk mengaktifkannya."),
+            actions: [
+              TextButton(
+                child: Text("Buka Pengaturan"),
+                onPressed: () async {
+                  // Buka pengaturan aplikasi (hanya untuk Android)
+                  if (Platform.isAndroid) {
+                    final AndroidIntent intent = AndroidIntent(
+                      action: 'action_application_details_settings',
+                      data: 'package:${Platform.operatingSystem}',
+                    );
+                    await intent.launch();
+                  }
+                  // Untuk iOS, Anda mungkin ingin memberi petunjuk tambahan kepada pengguna
+                },
+              ),
+              TextButton(
+                child: Text("Batal"),
+                onPressed: () => Navigator.of(context).pop(),
+              ),
+            ],
+          );
+        },
+      );
     }
 
     if (permission == LocationPermission.denied) {
@@ -262,7 +294,6 @@ class _PengirimanState extends State<Pengiriman> {
                 updateStatus();
                 _locationTimer?.cancel();
                 FlutterBackgroundService().invoke("stopService");
-                // _stopLocationUpdates();
 
                 Navigator.push(
                   context,
