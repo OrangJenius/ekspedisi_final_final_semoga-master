@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:android_intent_plus/android_intent.dart';
@@ -230,36 +229,6 @@ class _PengirimanState extends State<Pengiriman> {
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
       // Handle case when permission is permanently denied
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text("Izin Lokasi Ditolak"),
-            content: Text(
-                "Izin lokasi ditolak secara permanen. Silakan buka Pengaturan untuk mengaktifkannya."),
-            actions: [
-              TextButton(
-                child: Text("Buka Pengaturan"),
-                onPressed: () async {
-                  // Buka pengaturan aplikasi (hanya untuk Android)
-                  if (Platform.isAndroid) {
-                    final AndroidIntent intent = AndroidIntent(
-                      action: 'action_application_details_settings',
-                      data: 'package:${Platform.operatingSystem}',
-                    );
-                    await intent.launch();
-                  }
-                  // Untuk iOS, Anda mungkin ingin memberi petunjuk tambahan kepada pengguna
-                },
-              ),
-              TextButton(
-                child: Text("Batal"),
-                onPressed: () => Navigator.of(context).pop(),
-              ),
-            ],
-          );
-        },
-      );
     }
 
     if (permission == LocationPermission.denied) {
