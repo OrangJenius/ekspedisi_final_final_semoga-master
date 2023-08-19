@@ -109,7 +109,8 @@ class _PengirimanState extends State<Pengiriman> {
   String? formattedDate;
   late SharedPreferences prefs;
   BitmapDescriptor? customMarkerIcon;
-  BitmapDescriptor? sourceMarkerIcon;
+  BitmapDescriptor sourceMarkerIcon =
+      BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
   BitmapDescriptor? destinationMarkerIcon;
 
   Timer? _locationTimer;
@@ -157,21 +158,21 @@ class _PengirimanState extends State<Pengiriman> {
 
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 1),
-      'assets/currentLocation.png', // Replace with your asset path
+      'assets/icons8-truck-75.png', // Replace with your asset path
     ).then((descriptor) {
       setState(() {
         customMarkerIcon = descriptor;
       });
     });
 
-    BitmapDescriptor.fromAssetImage(
-      ImageConfiguration(devicePixelRatio: 1),
-      'assets/sourceLocation.png', // Replace with your asset path
-    ).then((descriptor) {
-      setState(() {
-        sourceMarkerIcon = descriptor;
-      });
-    });
+    // BitmapDescriptor.fromAssetImage(
+    //   ImageConfiguration(devicePixelRatio: 1),
+    //   'assets/sourceLocation.png', // Replace with your asset path
+    // ).then((descriptor) {
+    //   setState(() {
+    //     sourceMarkerIcon = descriptor;
+    //   });
+    // });
 
     BitmapDescriptor.fromAssetImage(
       ImageConfiguration(devicePixelRatio: 1),
@@ -406,11 +407,13 @@ class _PengirimanState extends State<Pengiriman> {
                           _currentLocation!.latitude,
                           _currentLocation!.longitude,
                         ),
+                        icon: customMarkerIcon!,
                         infoWindow: const InfoWindow(title: 'Current Location'),
                       ),
                       Marker(
                         markerId: const MarkerId('source'),
                         position: _srcLoc,
+                        icon: sourceMarkerIcon,
                         infoWindow: const InfoWindow(title: 'Source Location'),
                       ),
                       Marker(
