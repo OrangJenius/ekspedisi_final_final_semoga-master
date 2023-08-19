@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:android_intent_plus/android_intent.dart';
 import 'package:final_project_semoga/screens/home.dart';
 import 'package:final_project_semoga/screens/laporanKerusakan.dart';
 import 'package:flutter/material.dart';
@@ -219,25 +218,29 @@ class _PengirimanState extends State<Pengiriman> {
 
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      final AndroidIntent intent = AndroidIntent(
-        action: 'android.settings.LOCATION_SOURCE_SETTINGS',
-      );
-      await intent.launch();
-      return;
+      // Location services are not enabled don't continue
+      // accessing the position and request users of the
+      // App to enable the location services.
+      return Future.error('Location services are disabled.');
     }
 
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      // Handle case when permission is permanently denied
-    }
-
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        // Handle case when permission is denied
-        return;
+      if (permission == LocationPermission.denied) {
+        // Permissions are denied, next time you could try
+        // requesting permissions again (this is also where
+        // Android's shouldShowRequestPermissionRationale
+        // returned true. According to Android guidelines
+        // your App should show an explanatory UI now.
+        return Future.error('Location permissions are denied');
       }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      // Permissions are denied forever, handle appropriately.
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
 
     Geolocator.getPositionStream().listen((Position newPosition) {
