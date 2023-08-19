@@ -46,7 +46,7 @@ Future<void> onStart(ServiceInstance service) async {
     service.stopSelf();
   });
 
-  Timer.periodic(Duration(seconds: 10), (timer) {
+  Timer.periodic(Duration(seconds: 1), (timer) {
     //tempat untuk update lokasi ke rest api ketika berjalan di background
     getLocation();
     print("berjalannnnnnn hahahhahah2");
